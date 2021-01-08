@@ -1,0 +1,41 @@
+code {
+    text-align: center;
+}
+
+.loginInputs{
+    display: flex;
+    min-height: 5vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 10;
+}
+
+.loginInputs>input{
+    margin: 5px;
+}
+
+.loginButton{
+    display: flex;
+    min-height: 5vh;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 10;
+}
+
+.loginButton>button{
+    width: 70px;
+    margin: 10px;
+}
+
+.loginpage {
+   background-color: #282c34;
+   min-height: 100vh;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   font-size: calc(10px + 2vmin);
+   color: white;
+}
