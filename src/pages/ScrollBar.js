@@ -96,6 +96,9 @@ class ScrollBar extends React.Component{
     }
 
     render(){
+        if (this.canvasRef.current)
+            this.renderCanvas();
+
         return <canvas
                 ref={this.canvasRef}
                 width={this.props.width} height={this.props.height}

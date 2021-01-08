@@ -13,7 +13,6 @@ class CanvasGraph extends React.Component{
         this.play = this.play.bind(this);
         this.stop = this.stop.bind(this);
         this.setoffset = this.setoffset.bind(this);
-        this.keyDownEvent = this.keyDownEvent.bind(this);
         
         var channelCount = props.channels;
         this.peakArray = [];
@@ -39,13 +38,10 @@ class CanvasGraph extends React.Component{
         this.canvasContext.lineWidth = 1;
         this.canvasContext.shadowBlur = 0;
         this.play();
-
-        document.addEventListener("keydown", this.keyDownEvent);
     }
 
     componentWillUnmount() {
         this.stop();
-        document.removeEventListener("keydown", this.keyDownEvent);
     }
 
     //Play
@@ -77,11 +73,6 @@ class CanvasGraph extends React.Component{
     }
 
     //Events
-    keyDownEvent (e){
-        if (e.keyCode === 32)
-            this.togglePlay();
-    }
-
     setoffset(pos){
         for (var i = 0; i < this.peakArray.length; i++){
             this.peakOffset[i] = Math.floor((this.peakArray[i].length - this.props.count - 1) * pos);
@@ -136,10 +127,22 @@ class CanvasGraph extends React.Component{
             this.scrollBarRef.setHandlePosition(this.peakOffset[0] / (this.peakArray[0].length - this.props.count - 1));
     }
 
+    getCanvas(){
+        return this.canvasRef.current;
+    }
+
     render(){
-        return  <div>
+        var style={
+            display: 'flex',
+            flexDirection: 'column'
+        };
+
+        if (this.canvasRef.current)
+            this.draw();
+
+        return  <div style={style}>
                     <canvas ref={this.canvasRef} 
-                    width={this.props.width} height={this.peakArray.length * 20}/>
+                    width={this.props.width} height={this.props.channels * this.props.height}/>
                     <ScrollBar ref={ref=>{this.scrollBarRef = ref;}}
                     width={this.props.width} height='20'
                     handleWidth={this.props.count / this.peakArray[0].length}

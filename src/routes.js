@@ -1,13 +1,13 @@
 import React from 'react';
-import {Route, IndexRoute} from 'react-router';
+import {BrowserRouter} from 'react-router-dom';
+import {Route} from 'react-router';
 
-import App from './App';
+import Viewer from './pages/viewer';
 import LoginPage from './pages/loginpage'
-import MainPage from './pages/mainpage'
 
 export default(
-    <div>
-        <Route exact path="/" component={App}/>
+    <BrowserRouter>
+        <Route exact path="/" component={Viewer}/>
         <Route path='/login' component={LoginPage}/>
-    </div>
+    </BrowserRouter>
 );
