@@ -1,10 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const app = (
@@ -13,5 +11,5 @@ const app = (
   </React.StrictMode>
 );
 
-ReactDOM.render(routes, document.getElementById('root'));
+ReactDOM.render(app, document.getElementById('root'));
 reportWebVitals();

@@ -1,8 +1,7 @@
 const express = require('express');
+const auth = require('./auth');
 const router = express.Router();
 
-router.use('/', (req, res) => {
-  res.redirect('/login');
-});
+router.use('/auth', auth);
 
 module.exports = router;

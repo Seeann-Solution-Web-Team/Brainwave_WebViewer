@@ -1,9 +1,7 @@
 const express = require('express');
 const app = express();
 const indexRouter = require('../routes/api/index');
-const authRouter = require('../routes/api/auth');
 const port = process.env.port || 3001;
-const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -13,6 +11,7 @@ let passport = require('passport');
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(compression());
 app.use(cors());
 app.use(
@@ -22,15 +21,9 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(
-  createProxyMiddleware('/api', {
-    target: 'http://localhost:3001',
-    changeOrigin: true,
-  })
-);
 // app.use(passport.initialize());
 // app.use(passport.session());
-app.use('/auth', authRouter);
+app.use('/api', require('../routes/api'));
 app.use('/', indexRouter);
 
 app.use((req, res, next) => {

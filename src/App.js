@@ -1,33 +1,23 @@
 import React from 'react';
-import './App.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import Viewer from './pages/viewer';
 import LoginPage from './pages/loginpage';
+import index from './pages/index';
+import SignUpPage from './pages/signUpPage';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      username: null,
-    };
-  }
-
-  componentDidMount() {
-    fetch('http://localhost:3001/api')
-      .then((res) => res.json())
-      .then((data) => this.setState({ username: data.username }));
-  }
-
-  render() {
-    const { username } = this.state;
-    return (
-      <div className='App'>
-        <header className='App-header'>
-          {username ? `Hello ${username}` : 'Hello World'}
-        </header>
+function App() {
+  return (
+    <BrowserRouter>
+      <div>
+        <Switch>
+          <Route exact path='/' component={index} />
+          <Route path='/login' component={LoginPage} />
+          <Route path='/signup' component={SignUpPage} />
+        </Switch>
       </div>
-    );
-  }
+    </BrowserRouter>
+  );
 }
 
 export default App;
