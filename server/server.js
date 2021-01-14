@@ -7,7 +7,8 @@ const compression = require('compression');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-let passport = require('passport');
+const passport = require('passport');
+const passportConfig = require('../middlewares/passport');
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,8 +22,10 @@ app.use(
     saveUninitialized: true,
   })
 );
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+passportConfig();
+app.use(passport.session());
+
 app.use('/api', require('../routes/api'));
 app.use('/', indexRouter);
 
