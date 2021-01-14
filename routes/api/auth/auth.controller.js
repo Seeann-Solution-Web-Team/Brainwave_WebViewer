@@ -18,9 +18,7 @@ POST /api/auth/register
 
 exports.register = (req, res) => {
   let post = req.body;
-  console.log(post);
   bcrypt.hash(post.password, saltRounds).then(function (crypted_PW) {
-    console.log('crypted', crypted_PW);
     db.query(
       `INSERT INTO user (id, name, email, password)
     VALUES (UUID_TO_BIN(UUID(), true), ?, ?, ?)`,

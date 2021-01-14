@@ -22,7 +22,6 @@ module.exports = {
         if (error) {
           throw error;
         } else if (!user) {
-          console.log('1');
           return done(null, false);
         }
         bcrypt.compare(
@@ -33,10 +32,8 @@ module.exports = {
               throw err;
             }
             if (!isSamePassword) {
-              console.log('2', isSamePassword);
               return done(null, false);
             }
-            console.log('3');
             return done(null, user);
           }
         );
