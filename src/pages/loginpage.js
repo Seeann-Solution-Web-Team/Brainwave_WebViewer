@@ -51,6 +51,7 @@ class LoginPage extends React.Component {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
+        alert('로그인 되었습니다');
       });
   }
 

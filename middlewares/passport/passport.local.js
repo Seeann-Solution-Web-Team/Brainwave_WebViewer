@@ -12,8 +12,13 @@ module.exports = {
     db.query(
       `SELECT BIN_TO_UUID(id), name, email, password FROM user WHERE email=?`,
       [email],
-      (error, user) => {
-        console.log(user[0].password, password);
+      (error, result) => {
+        console.log(result[0]['BIN_TO_UUID(id)']);
+        const user = {
+          id: result[0]['BIN_TO_UUID(id)'],
+          username: result[0].name,
+          email: result[0].email,
+        };
         if (error) {
           throw error;
         } else if (!user) {
@@ -22,7 +27,7 @@ module.exports = {
         }
         bcrypt.compare(
           password,
-          user[0].password,
+          result[0].password,
           function (err, isSamePassword) {
             if (err) {
               throw err;
