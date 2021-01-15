@@ -1,23 +1,36 @@
 import React from 'react';
 import './index.css';
-import { Navbar } from 'react-bootstrap';
+import { Navbar, Image } from 'react-bootstrap';
 import { Component } from 'react';
 
 class mainPage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isLogin: '',
+    };
+  }
+
+  componentDidMount() {
+    console.log('index get');
+    // const index_GET = {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // };
+    fetch('/index')
+      // .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+      });
+  }
+
   render() {
     return (
       <div className='main'>
         <Navbar bg='dark' variant='dark'>
-          <Navbar.Brand href='/'>
-            <img
-              alt=''
-              src='/logo.svg'
-              width='30'
-              height='30'
-              className='d-inline-block align-top'
-            />{' '}
-            Brain - WEB
-          </Navbar.Brand>
+          <Navbar.Brand href='/'>Brain - WEB</Navbar.Brand>
           <Navbar.Collapse className='justify-content-end'>
             <Navbar.Text>
               <a href='/login'>Sign in</a>

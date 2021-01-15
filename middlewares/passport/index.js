@@ -7,5 +7,10 @@ const passportJwt = require('./passport.jwt');
 
 module.exports = () => {
   passport.use(new LocalStrategy(passportLocal.option, passportLocal.verify));
-  passport.use(new JwtStrategy(passportJwt.option, passportJwt.verify));
+  passport.use(
+    new JwtStrategy(
+      passportJwt.option(passportJwt.cookieExtractor),
+      passportJwt.verify
+    )
+  );
 };

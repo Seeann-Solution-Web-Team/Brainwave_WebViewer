@@ -13,7 +13,6 @@ module.exports = {
       `SELECT BIN_TO_UUID(id), name, email, password FROM user WHERE email=?`,
       [email],
       (error, result) => {
-        console.log(result[0]['BIN_TO_UUID(id)']);
         const user = {
           id: result[0]['BIN_TO_UUID(id)'],
           username: result[0].name,

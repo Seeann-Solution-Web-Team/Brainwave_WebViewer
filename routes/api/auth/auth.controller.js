@@ -68,7 +68,7 @@ exports.login = (req, res, next) => {
           'secret', // 나만의 시크릿키
           { expiresIn: '5m' } // 토큰 만료 시간
         );
-        console.log(token);
+        res.cookie('token', token, { httpOnly: true });
         return res.json({ token });
       });
     }

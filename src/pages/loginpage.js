@@ -47,7 +47,7 @@ class LoginPage extends React.Component {
       },
     };
 
-    fetch('http://localhost:3001/api/auth/login', login_POST)
+    fetch('/api/auth/login', login_POST)
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
