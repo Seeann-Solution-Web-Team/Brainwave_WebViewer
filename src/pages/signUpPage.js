@@ -1,5 +1,4 @@
 import React from 'react';
-import './loginPage.css';
 
 import {
   Button,
@@ -9,18 +8,26 @@ import {
   FormLabel,
 } from 'react-bootstrap';
 
-class LoginPage extends React.Component {
+class SignUpPage extends React.Component {
   constructor(props) {
     super(props);
 
+    this.handleUsernameChange = this.handleUsernameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePWChange = this.handlePWChange.bind(this);
+    this.handleConfirmPWChange = this.handleConfirmPWChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
     this.state = {
+      username: '',
       email: '',
       password: '',
+      confirm_password: '',
     };
+  }
+
+  handleUsernameChange(e) {
+    this.setState({ username: e.target.value });
   }
 
   handleEmailChange(e) {
@@ -31,28 +38,32 @@ class LoginPage extends React.Component {
     this.setState({ password: e.target.value });
   }
 
+  handleConfirmPWChange(e) {
+    this.setState({ confirm_password: e.target.value });
+  }
+
   handleSubmit(e) {
     e.preventDefault();
-
-    const loginInfo = {
+    const { username, email, password, confirm_password } = this.state;
+    const signUpInfo = {
+      username: this.state.username,
       email: this.state.email,
       password: this.state.password,
     };
-
-    const login_POST = {
+    const signUp_POST = {
       method: 'POST',
-      body: JSON.stringify(loginInfo),
+      body: JSON.stringify(signUpInfo),
       headers: {
         'Content-Type': 'application/json',
       },
     };
-
-    fetch('http://localhost:3001/api/auth/login', login_POST)
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-        alert('로그인 되었습니다');
-      });
+    if (password === confirm_password) {
+      fetch('http://localhost:3001/api/auth/register', signUp_POST)
+        .then(alert('가입이 완료되었습니다.'))
+        .then(this.props.history.push('/login'));
+    } else {
+      alert('입력값을 확인해주세요');
+    }
   }
 
   render() {
@@ -63,12 +74,20 @@ class LoginPage extends React.Component {
             Brainwave WEB
           </a>
         </h1>
-        <h2 className='text-center'>Sign In</h2>
-
+        <h2 className='text-center'>Sign Up</h2>
+        <FormGroup>
+          <FormLabel>Username</FormLabel>
+          <FormControl
+            type='text'
+            onChange={this.handleUsernameChange}
+            name='username'
+            placeholder='name'
+          />
+        </FormGroup>
         <FormGroup>
           <FormLabel>Email</FormLabel>
           <FormControl
-            type='text'
+            type='email'
             onChange={this.handleEmailChange}
             name='email'
             placeholder='email'
@@ -82,20 +101,26 @@ class LoginPage extends React.Component {
             name='password'
             placeholder='password'
           />
+          <FormControl
+            type='password'
+            onChange={this.handleConfirmPWChange}
+            name='password'
+            placeholder='Confirm your password'
+          />
         </FormGroup>
         <Button
           type='submit'
           onClick={this.handleSubmit}
           className='btn-lg btn-dark btn-block'
         >
-          Log In
+          CREATE ACCOUNT
         </Button>
         <div className='p-2'>
-          Don't have an account? <a href='/signup'>Sign up</a>
+          Already have an account? <a href='/login'>Sign in</a>
         </div>
       </Form>
     );
   }
 }
 
-export default LoginPage;
+export default SignUpPage;
