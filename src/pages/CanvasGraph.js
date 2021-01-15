@@ -13,7 +13,8 @@ class CanvasGraph extends React.Component{
         this.play = this.play.bind(this);
         this.stop = this.stop.bind(this);
         this.setoffset = this.setoffset.bind(this);
-        
+        this.setpeaks = this.setpeaks.bind(this);
+
         var channelCount = props.channels;
         this.peakArray = [];
         this.peakOffset = [];
@@ -26,8 +27,7 @@ class CanvasGraph extends React.Component{
             this.peakOffset.push(0);
 
             for (i = 0; i < 100000; i++){
-                var rand = (Math.random() - 0.5) * 2;
-                this.peakArray[c].push(rand);
+                this.peakArray[c].push(0);
             }
         }
     }
@@ -46,6 +46,13 @@ class CanvasGraph extends React.Component{
 
     //Play
     play (){
+        //Rewind
+        if (this.peakOffset[0] === this.peakArray[0].length - this.props.count - 1){
+            for(var i = 0; i < this.props.channels; i++){
+                this.peakOffset[i] = 0; 
+            }
+        }
+        
         this.timer = setInterval(()=>{this.update(); this.draw();}, 5);
         this.isPlaying = true;
 
@@ -71,20 +78,39 @@ class CanvasGraph extends React.Component{
         else
             this.play();
     }
+    
+    //Controls
+    setpeaks(arr){
+        this.peakArray = arr;
+        for (var i = 0; i < arr.length; i++){
+            if (this.peakOffset.length - 1 < i)
+                this.peakOffset.push(0);
+            else
+                this.peakOffset[i] = 0;
+        }
 
-    //Events
+        this.scrollBarRef.setHandlePosition(0);
+        this.draw();
+
+        if (this.props.onOffsetChanged !== undefined)
+            this.props.onOffsetChanged(0);
+    }
+
     setoffset(pos){
         for (var i = 0; i < this.peakArray.length; i++){
             this.peakOffset[i] = Math.floor((this.peakArray[i].length - this.props.count - 1) * pos);
         }
 
         this.draw();
+
+        if (this.props.onOffsetChanged !== undefined)
+            this.props.onOffsetChanged(pos);
     }
 
     //Play Loop
     update (){
         for (var i = 0; i < this.peakArray.length; i++){
-            this.peakOffset[i] += 40;
+            this.peakOffset[i] += this.props.speed;
         }
 
         if (this.peakOffset[0] > this.peakArray[0].length - this.props.count - 1){
@@ -93,16 +119,24 @@ class CanvasGraph extends React.Component{
             }
             this.stop();
         }
+
+        if (this.props.onOffsetChanged !== undefined)
+            this.props.onOffsetChanged(this.peakOffset[0] / (this.peakArray[0].length - this.props.count - 1));
+
+        if (this.scrollBarRef != null)
+            this.scrollBarRef.setHandlePosition(this.peakOffset[0] / (this.peakArray[0].length - this.props.count - 1));
     }
 
     draw (){
         if (this.peakArray[0].length < 2)
             return;
+        
+        var channelCount = this.props.channels > this.peakArray.length ? this.peakArray.length : this.props.channels;
 
         var len = this.props.count < this.peakArray[0].length ? this.props.count : this.peakArray[0].length;
         var width = this.canvasRef.current.offsetWidth;
         var height = this.canvasRef.current.offsetHeight;
-        var halfHeight = height / 2 / this.peakArray.length;
+        var halfHeight = height / 2 / channelCount;
         var widthStep = width / this.props.count;
 
         var startX = width - (len * widthStep) + 0.5;
@@ -113,7 +147,7 @@ class CanvasGraph extends React.Component{
 
         var currentIdx = 0;
         this.canvasContext.beginPath();
-        for (var c = 0; c < this.peakArray.length; c++){
+        for (var c = 0; c < channelCount; c++){
             this.canvasContext.moveTo(startX, (this.peakArray[c][0] * halfHeight) + (halfHeight * (c * 2 + 1)));
 
             for(var i = 1; i < len; i++){
@@ -122,9 +156,6 @@ class CanvasGraph extends React.Component{
             }
         }
         this.canvasContext.stroke();
-
-        if (this.scrollBarRef != null)
-            this.scrollBarRef.setHandlePosition(this.peakOffset[0] / (this.peakArray[0].length - this.props.count - 1));
     }
 
     getCanvas(){
@@ -137,18 +168,19 @@ class CanvasGraph extends React.Component{
             flexDirection: 'column'
         };
 
-        if (this.canvasRef.current)
+        if (this.canvasRef.current != null)
             this.draw();
 
-        return  <div style={style}>
-                    <canvas ref={this.canvasRef} 
-                    width={this.props.width} height={this.props.channels * this.props.height}/>
-                    <ScrollBar ref={ref=>{this.scrollBarRef = ref;}}
-                    width={this.props.width} height='20'
-                    handleWidth={this.props.count / this.peakArray[0].length}
-                    onDragStart={this.stop}
-                    onDrag={this.setoffset}/>
-                </div>
+        return (
+        <div style={style}>
+            <canvas ref={this.canvasRef} 
+            width={this.props.width} height={this.props.channels * this.props.height}/>
+            <ScrollBar ref={ref=>{this.scrollBarRef = ref;}}
+            width={this.props.width} height='20'
+            handleWidth={this.props.count / this.peakArray[0].length}
+            onDragStart={this.stop}
+            onDrag={this.setoffset}/>
+        </div>);
     }
 }
 

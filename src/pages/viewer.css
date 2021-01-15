@@ -1,3 +1,12 @@
+option{
+    color: #FFFFFF;
+    background-color: #323741;
+}
+
+span{
+    color: #FFFFFF;
+}
+
 .Viewer {
   text-align: center;
   display: flex;
@@ -19,8 +28,23 @@
 
 .Viewer_Menu{
   display: flex;
-  min-width: 20vh;
+  min-width: 15vw;
   min-height: 100vh;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.player_Controller{
+  background-color: #404755;
+  display: flex;
+  flex-direction: column;
+  min-height: 50%;
+}
+
+.files{
+  background-color: #323741;
+  display: flex;
+  min-height: 50%;
 }
 
 .Viewer_Graph {

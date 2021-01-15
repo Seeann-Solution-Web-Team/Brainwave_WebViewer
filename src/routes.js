@@ -8,6 +8,6 @@ import LoginPage from './pages/loginpage'
 export default(
     <BrowserRouter>
         <Route exact path="/" component={Viewer}/>
-        <Route path='/login' component={LoginPage}/>
+        <Route path='/loginpage' component={LoginPage}/>
     </BrowserRouter>
 );
