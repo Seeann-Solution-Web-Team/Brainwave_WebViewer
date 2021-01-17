@@ -58,7 +58,7 @@ class SignUpPage extends React.Component {
       },
     };
     if (password === confirm_password) {
-      fetch('http://localhost:3001/api/auth/register', signUp_POST)
+      fetch('/api/auth/register', signUp_POST)
         .then(alert('가입이 완료되었습니다.'))
         .then(this.props.history.push('/login'));
     } else {
