@@ -30,10 +30,10 @@ app.use(passport.initialize());
 passportConfig();
 app.use(passportJwt.authenticateJWT);
 
-app.get('/index', (req, res) => {
-  console.log(req.user);
-  res.send(req.user);
-});
+// app.get('*', (req, res) => {
+//   console.log(req.user);
+//   res.send(req.user);
+// });
 app.use('/api', require('../routes/api'));
 
 app.use((req, res, next) => {

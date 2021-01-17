@@ -1,5 +1,4 @@
 import React from 'react';
-import './loginPage.css';
 
 import {
   Button,
@@ -52,7 +51,8 @@ class LoginPage extends React.Component {
       .then((res) => {
         console.log(res);
         alert('로그인 되었습니다');
-      });
+      })
+      .then(this.props.history.push('/storage'));
   }
 
   render() {
