@@ -13,29 +13,30 @@ module.exports = {
       `SELECT BIN_TO_UUID(id), name, email, password FROM user WHERE email=?`,
       [email],
       (error, result) => {
-        const user = {
-          id: result[0]['BIN_TO_UUID(id)'],
-          username: result[0].name,
-          email: result[0].email,
-        };
         if (error) {
           throw error;
-        } else if (!user) {
+        } else if (!result) {
           return done(null, false);
+        } else {
+          const user = {
+            id: result[0]['BIN_TO_UUID(id)'],
+            username: result[0].name,
+            email: result[0].email,
+          };
+          bcrypt.compare(
+            password,
+            result[0].password,
+            function (err, isSamePassword) {
+              if (err) {
+                throw err;
+              }
+              if (!isSamePassword) {
+                return done(null, false);
+              }
+              return done(null, user);
+            }
+          );
         }
-        bcrypt.compare(
-          password,
-          result[0].password,
-          function (err, isSamePassword) {
-            if (err) {
-              throw err;
-            }
-            if (!isSamePassword) {
-              return done(null, false);
-            }
-            return done(null, user);
-          }
-        );
       }
     );
   },

@@ -50,7 +50,7 @@ class SignUpPage extends React.Component {
       email: this.state.email,
       password: this.state.password,
     };
-    const signUp_POST = {
+    const signUp = {
       method: 'POST',
       body: JSON.stringify(signUpInfo),
       headers: {
@@ -58,7 +58,7 @@ class SignUpPage extends React.Component {
       },
     };
     if (password === confirm_password) {
-      fetch('/api/auth/register', signUp_POST)
+      fetch('/api/auth/register', signUp)
         .then(alert('가입이 완료되었습니다.'))
         .then(this.props.history.push('/login'));
     } else {
@@ -71,7 +71,7 @@ class SignUpPage extends React.Component {
       <Form className='login-form'>
         <h1>
           <a className='font-weight-bold text-decoration-none' href='/'>
-            Brainwave WEB
+            Brainwave WEBs
           </a>
         </h1>
         <h2 className='text-center'>Sign Up</h2>

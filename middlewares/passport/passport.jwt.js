@@ -1,5 +1,6 @@
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const passport = require('passport');
+const db = require('../../models/db');
 
 module.exports = {
   cookieExtractor: (req) => {
@@ -16,16 +17,26 @@ module.exports = {
     };
   },
   verify: async (payload, done) => {
-    console.log('payload', payload.id, payload.username, payload.email);
+    console.log('payload', payload.id);
+    db.query(
+      `SELECT BIN_TO_UUID(id), name, email FROM user WHERE id=?`,
+      [payload.id],
+      (error, result) => {
+        if (error) {
+          throw error;
+        } else if (!user) {
+          return done(null, false);
+        } else {
+          const user = {
+            id: result[0]['BIN_TO_UUID(id)'],
+            username: result[0].name,
+            email: result[0].email,
+          };
+          return done(null, user);
+        }
+      }
+    );
     return done(null, { id: 'asd' });
-    // let user;
-    // try {
-    //   user = await userDAO.find(payload.uid);
-    //   if (!user) return done(null, false);
-    // } catch (e) {
-    //   return done(e);
-    // }
-    // return done(null, user);
   },
   authenticateJWT: (req, res, next) =>
     passport.authenticate('jwt', { sessions: false }, (error, user) => {

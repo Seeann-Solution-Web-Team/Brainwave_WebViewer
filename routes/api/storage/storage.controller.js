@@ -7,7 +7,11 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
-exports.desc = (req, res) => {
-  db.query(`SELECT `);
-  res.send('asd');
+exports.filelist = (req, res) => {
+  db.query(`SELECT * FROM rhs_data`, (error, result) => {
+    console.log(result);
+  });
+  res.json({ a: 'asd' });
 };
+
+exports.userfile = (req, res) => {};
