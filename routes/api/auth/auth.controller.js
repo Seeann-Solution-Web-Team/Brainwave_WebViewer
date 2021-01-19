@@ -62,11 +62,9 @@ exports.login = (req, res, next) => {
         const token = jwt.sign(
           {
             id: user.id,
-            username: user.username,
-            email: user.email,
-          }, // 토큰에 입력할 private 값
-          'secret', // 나만의 시크릿키
-          { expiresIn: '5m' } // 토큰 만료 시간
+          },
+          'secret',
+          { expiresIn: '5m' }
         );
         res.cookie('token', token, { httpOnly: true });
         return res.json({ token });
