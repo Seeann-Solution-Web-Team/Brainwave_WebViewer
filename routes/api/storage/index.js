@@ -1,7 +1,16 @@
 const router = require('express').Router();
-const controller = require('./storage.controller');
+const readController = require('./read.controller');
+const uploadController = require('./upload.controller');
+const upload = require('../../../middlewares/upload');
 
-router.post('/userfile', controller.userfile);
-router.get('/filelist', controller.filelist);
+//Read
+router.get('/filelist', readController.readFileList);
+
+//Create
+router.post(
+  '/userfile',
+  upload.single('rhs_file'),
+  uploadController.uploadFile
+);
 
 module.exports = router;

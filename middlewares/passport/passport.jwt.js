@@ -19,12 +19,12 @@ module.exports = {
   verify: async (payload, done) => {
     console.log('payload', payload.id);
     db.query(
-      `SELECT BIN_TO_UUID(id), name, email FROM user WHERE id=?`,
+      `SELECT BIN_TO_UUID(id), name, email FROM user WHERE id=UUID_TO_BIN(?)`,
       [payload.id],
       (error, result) => {
         if (error) {
           throw error;
-        } else if (!user) {
+        } else if (!result) {
           return done(null, false);
         } else {
           const user = {
@@ -36,10 +36,12 @@ module.exports = {
         }
       }
     );
-    return done(null, { id: 'asd' });
   },
   authenticateJWT: (req, res, next) =>
     passport.authenticate('jwt', { sessions: false }, (error, user) => {
+      if (error) {
+        throw error;
+      }
       //verifyUser에서 user를 찾았다면 서버에게 요청하는 req객체의 user에 담아서 서버에게 넘겨줌
       if (user) {
         req.user = user;

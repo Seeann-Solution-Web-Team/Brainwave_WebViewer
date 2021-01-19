@@ -30,9 +30,9 @@ class UploadModal extends React.Component {
               />
             </Form.Group>
             <Form.Group>
-              <Form.Control
+              <Form.File
                 name='rhs_file'
-                type='file'
+                required
                 accept='.rhs'
                 onChange={this.props.handleFileInput}
               />

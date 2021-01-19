@@ -60,17 +60,27 @@ class StoragePage extends React.Component {
 
   handleUpload = (e) => {
     console.log('handle Upload');
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('title', this.state.uploadFileTitle);
-    formData.append('uploadFile', this.state.uploadFile);
-    const upload = {
-      method: 'POST',
-      body: formData,
-    };
-    fetch('/api/storage/userfile', upload).then((result) => {
-      console.log('Success:', result);
-    });
+    console.log('title:', this.state.uploadFileTitle);
+    console.log('file:', this.state.uploadFile);
+    if (this.state.uploadFileTitle === null || this.state.uploadFile === null) {
+      alert('Missing fields');
+    } else {
+      const formData = new FormData();
+      formData.append('title', this.state.uploadFileTitle);
+      formData.append('rhs_file', this.state.uploadFile);
+      const upload = {
+        method: 'POST',
+        body: formData,
+      };
+      fetch('/api/storage/userfile', upload).then((result) => {
+        console.log('handleUpload result:', result);
+        this.setModalShow(false);
+        this.setState({
+          uploadFileTitle: null,
+          uploadFile: null,
+        });
+      });
+    }
   };
 
   getDataList(e) {}
@@ -82,8 +92,8 @@ class StoragePage extends React.Component {
   };
 
   handleFileInput = (e) => {
-    e.preventDefault();
     let files = e.target.files;
+    console.log('fileinput: ', files);
 
     if (files && files.length > 0) {
       this.setState({ uploadFile: files[0] });
@@ -93,7 +103,6 @@ class StoragePage extends React.Component {
   };
 
   handleFileTitle = (e) => {
-    e.preventDefault();
     this.setState({
       uploadFileTitle: e.target.value,
     });
@@ -110,8 +119,8 @@ class StoragePage extends React.Component {
           show={this.state.modalShow}
           onHide={() => this.setModalShow(false)}
           handleUpload={() => this.handleUpload()}
-          handlFileInput={() => this.handlFileInput()}
-          handleFileTitle={() => this.handleFileTitle()}
+          handleFileInput={this.handleFileInput}
+          handleFileTitle={this.handleFileTitle}
         />
         <Button
           variant='outline-primary'
