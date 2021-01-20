@@ -17,7 +17,7 @@ module.exports = {
     };
   },
   verify: async (payload, done) => {
-    console.log('payload', payload.id);
+    console.log('payload', payload);
     db.query(
       `SELECT BIN_TO_UUID(id), name, email FROM user WHERE id=UUID_TO_BIN(?)`,
       [payload.id],

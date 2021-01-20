@@ -1,4 +1,5 @@
 import React from 'react';
+import './auth.css';
 
 import {
   Button,
@@ -70,8 +71,11 @@ class SignUpPage extends React.Component {
     return (
       <Form className='login-form'>
         <h1>
-          <a className='font-weight-bold text-decoration-none' href='/'>
-            Brainwave WEBs
+          <a
+            className='text-center font-weight-bold text-decoration-none'
+            href='/'
+          >
+            Brainwave WEB
           </a>
         </h1>
         <h2 className='text-center'>Sign Up</h2>

@@ -14,37 +14,24 @@ class StoragePage extends React.Component {
       selectedFileId: null,
       uploadFile: null,
       uploadFileTitle: null,
-      dataList: {
-        item1: {
-          num: 1,
-          id: '1225262-12352',
-          title: '123',
-          fileName: 'asd.rhs',
-          date: 'Nov. 13',
-        },
-        item2: {
-          num: 2,
-          id: '12521621-213214',
-          title: '456',
-          fileName: 'asd.rhs',
-          date: 'Nov. 13',
-        },
-        item3: {
-          num: 3,
-          id: '1231232-1254121',
-          title: '245',
-          fileName: 'asd.rhs',
-          date: 'Nov. 13',
-        },
-      },
+      dataList: null,
     };
   }
 
   componentDidMount = (e) => {
-    console.log('storage/filelist');
     fetch('/api/storage/filelist')
       .then((res) => res.json())
-      .then((res) => console.log(res));
+      .then((res) => {
+        console.log(res);
+        // let datalist_JSON = [];
+        // res.map((result) => {
+        //   datalist_JSON.append(JSON.parse(result));
+        // });
+
+        this.setState({
+          dataList: res,
+        });
+      });
   };
 
   getSelectedFileId = (Id) => {
