@@ -18,7 +18,7 @@ class StoragePage extends React.Component {
     };
   }
 
-  componentDidMount = (e) => {
+  getUserFileList = () => {
     fetch('/api/storage/filelist')
       .then((res) => res.json())
       .then((res) => {
@@ -32,6 +32,9 @@ class StoragePage extends React.Component {
           dataList: res,
         });
       });
+  };
+  componentDidMount = (e) => {
+    this.getUserFileList();
   };
 
   getSelectedFileId = (Id) => {
@@ -66,6 +69,7 @@ class StoragePage extends React.Component {
           uploadFileTitle: null,
           uploadFile: null,
         });
+        this.getUserFileList();
       });
     }
   };
