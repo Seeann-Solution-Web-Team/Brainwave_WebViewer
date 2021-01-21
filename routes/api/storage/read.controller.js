@@ -10,7 +10,7 @@ const saltRounds = 10;
 exports.readFileList = (req, res) => {
   console.log('readfile userId: ', req.user.id);
   db.query(
-    `SELECT JSON_OBJECT('user_title', user_title, 'name', name, 'date', DATE(date)) FROM rhs_data WHERE owner_id = UUID_TO_BIN(?) ORDER BY TIME(date) DESC`,
+    `SELECT JSON_OBJECT('id', BIN_TO_UUID(id, true) ,'user_title', user_title, 'name', name, 'date', DATE(date)) FROM rhs_data WHERE owner_id = UUID_TO_BIN(?, true) ORDER BY TIME(date) DESC`,
     [req.user.id],
     (error, result) => {
       if (error) {
@@ -21,7 +21,7 @@ exports.readFileList = (req, res) => {
         userFileJSON.push(
           JSON.parse(
             element[
-              `JSON_OBJECT('user_title', user_title, 'name', name, 'date', DATE(date))`
+              `JSON_OBJECT('id', BIN_TO_UUID(id, true) ,'user_title', user_title, 'name', name, 'date', DATE(date))`
             ]
           )
         );

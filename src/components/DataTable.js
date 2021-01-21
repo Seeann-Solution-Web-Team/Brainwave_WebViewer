@@ -32,7 +32,6 @@ class DataTable extends React.Component {
       TableRow = (
         <tbody>
           {Object.keys(this.props.dataList).map((item, i) => {
-            console.log(this.props.dataList);
             let list = this.props.dataList;
             let length = Object.keys(this.props.dataList).length;
             let num = length - i;
@@ -40,10 +39,10 @@ class DataTable extends React.Component {
               <tr
                 style={
                   this.state.isActive === list[item].id
-                    ? { background: 'red' }
+                    ? { background: 'grey' }
                     : { background: '' }
                 }
-                key={num}
+                key={list[item].id}
                 onClick={() => this.toggleActive(list[item].id)}
               >
                 <td>{num}</td>

@@ -1,10 +1,8 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import DataTable from '../components/DataTable';
-// import DeleteButton from '../components/Button/DeleteButton';
-// import ReviseButton from '../components/Button/ReviseButton';
-// import UploadButton from '../components/Button/UploadButton';
 import UploadModal from '../components/UploadModal';
+import './storagePage.css';
 
 class StoragePage extends React.Component {
   constructor(props) {
@@ -23,11 +21,6 @@ class StoragePage extends React.Component {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        // let datalist_JSON = [];
-        // res.map((result) => {
-        //   datalist_JSON.append(JSON.parse(result));
-        // });
-
         this.setState({
           dataList: res,
         });
@@ -55,14 +48,14 @@ class StoragePage extends React.Component {
     if (this.state.uploadFileTitle === null || this.state.uploadFile === null) {
       alert('Missing fields');
     } else {
-      const formData = new FormData();
+      let formData = new FormData();
       formData.append('title', this.state.uploadFileTitle);
       formData.append('rhs_file', this.state.uploadFile);
-      const upload = {
+      const upload_options = {
         method: 'POST',
         body: formData,
       };
-      fetch('/api/storage/userfile', upload).then((result) => {
+      fetch('/api/storage/userfile', upload_options).then((result) => {
         console.log('handleUpload result:', result);
         this.setModalShow(false);
         this.setState({
@@ -71,6 +64,33 @@ class StoragePage extends React.Component {
         });
         this.getUserFileList();
       });
+    }
+  };
+
+  handleFileRemove = (e) => {
+    console.log('handle file remove');
+    if (this.state.selectedFileId !== null) {
+      console.log('selected file ID:', this.state.selectedFileId);
+      const delete_dto = {
+        fileId: this.state.selectedFileId,
+      };
+
+      const delete_options = {
+        method: 'DELETE',
+        body: JSON.stringify(delete_dto),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+      fetch(`/api/storage/userfile`, delete_options).then((res) => {
+        console.log('handle delete: ', res);
+        this.setState({
+          selectedFileId: null,
+        });
+        this.getUserFileList();
+      });
+    } else {
+      alert('Please select a file to delete');
     }
   };
 
@@ -101,8 +121,9 @@ class StoragePage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className='storage_container'>
         <DataTable
+          className='storage_list'
           dataList={this.state.dataList}
           getSelectedFileId={this.getSelectedFileId}
         />
@@ -113,17 +134,18 @@ class StoragePage extends React.Component {
           handleFileInput={this.handleFileInput}
           handleFileTitle={this.handleFileTitle}
         />
-        <Button
-          variant='outline-primary'
-          onClick={() => this.setModalShow(true)}
-        >
-          Upload
-        </Button>
-        <Button variant='outline-primary'>Revise</Button>
-        <Button variant='outline-primary'>Delete</Button>
-        {/* <UploadButton onClick={this.handleUpload} />
-        <ReviseButton />
-        <DeleteButton /> */}
+        <div className='storage_button'>
+          <Button
+            variant='outline-primary'
+            onClick={() => this.setModalShow(true)}
+          >
+            Upload
+          </Button>
+          <Button variant='outline-primary'>Revise</Button>
+          <Button variant='outline-primary' onClick={this.handleFileRemove}>
+            Delete
+          </Button>
+        </div>
       </div>
     );
   }
