@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import DataTable from '../components/DataTable';
-import UploadModal from '../components/UploadModal';
+import CustomModal from '../components/CustomModal';
 import './storagePage.css';
 
 class StoragePage extends React.Component {
@@ -9,7 +9,9 @@ class StoragePage extends React.Component {
     super(props);
     this.state = {
       modalShow: true,
+      modalType: null,
       selectedFileId: null,
+      selectedFileTitle: null,
       uploadFile: null,
       uploadFileTitle: null,
       dataList: null,
@@ -41,6 +43,17 @@ class StoragePage extends React.Component {
     );
   };
 
+  getSelectedFileTitle = (title) => {
+    this.setState(
+      {
+        selectedFileTitle: title,
+      },
+      () => {
+        console.log(this.state.selectedFileTitle);
+      }
+    );
+  };
+
   handleUpload = (e) => {
     console.log('handle Upload');
     console.log('title:', this.state.uploadFileTitle);
@@ -65,6 +78,10 @@ class StoragePage extends React.Component {
         this.getUserFileList();
       });
     }
+  };
+
+  handleFileRename = (e) => {
+    console.log('handle fi');
   };
 
   handleFileRemove = (e) => {
@@ -94,11 +111,24 @@ class StoragePage extends React.Component {
     }
   };
 
+  handleFileOpen = (e) => {
+    if (this.state.selectedFileId !== null) {
+      this.props.history.push({
+        pathname: '/',
+        state: { fileId: this.state.selectedFileId },
+      });
+    } else {
+      console.log('file not selected');
+      return;
+    }
+  };
+
   getDataList(e) {}
 
-  setModalShow = (show) => {
+  setModalShow = (show, type) => {
     this.setState({
       modalShow: show,
+      modalType: type,
     });
   };
 
@@ -127,9 +157,10 @@ class StoragePage extends React.Component {
           dataList={this.state.dataList}
           getSelectedFileId={this.getSelectedFileId}
         />
-        <UploadModal
+        <CustomModal
           show={this.state.modalShow}
           onHide={() => this.setModalShow(false)}
+          type={this.state.modalType}
           handleUpload={() => this.handleUpload()}
           handleFileInput={this.handleFileInput}
           handleFileTitle={this.handleFileTitle}
@@ -137,13 +168,22 @@ class StoragePage extends React.Component {
         <div className='storage_button'>
           <Button
             variant='outline-primary'
-            onClick={() => this.setModalShow(true)}
+            onClick={() => this.setModalShow(true, 'upload')}
           >
             Upload
           </Button>
-          <Button variant='outline-primary'>Revise</Button>
+          <Button
+            variant='outline-primary'
+            onClick={() => this.setModalShow(true, 'rename')}
+            selectedFileTitle={this.state.selectedFileTitle}
+          >
+            Rename
+          </Button>
           <Button variant='outline-primary' onClick={this.handleFileRemove}>
             Delete
+          </Button>
+          <Button variant='outline-primary' onClick={this.handleFileOpen}>
+            Open
           </Button>
         </div>
       </div>

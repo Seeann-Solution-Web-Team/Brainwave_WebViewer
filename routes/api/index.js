@@ -3,6 +3,7 @@ const passport = require('passport');
 const auth = require('./auth');
 const storage = require('./storage');
 const router = express.Router();
+const viewer = require('./viewer');
 
 router.use('/auth', auth);
 // router.use('/', (req, res, next) => {
@@ -15,5 +16,6 @@ router.use('/auth', auth);
 //   res.send(req.user);
 // });
 router.use('/storage', storage);
+router.use('/viewer', viewer);
 
 module.exports = router;

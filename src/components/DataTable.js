@@ -10,17 +10,19 @@ class DataTable extends React.Component {
     };
   }
 
-  toggleActive = (i) => {
-    if (i === this.state.isActive) {
+  toggleActive = (id, title) => {
+    if (id === this.state.isActive) {
       this.setState({
         isActive: null,
       });
       this.props.getSelectedFileId(null);
+      this.props.getSelectedFileTitle(null);
     } else {
       this.setState({
-        isActive: i,
+        isActive: id,
       });
-      this.props.getSelectedFileId(i);
+      this.props.getSelectedFileId(id);
+      this.props.getSelectedFileTitle(title);
     }
   };
 
@@ -43,7 +45,9 @@ class DataTable extends React.Component {
                     : { background: '' }
                 }
                 key={list[item].id}
-                onClick={() => this.toggleActive(list[item].id)}
+                onClick={() =>
+                  this.toggleActive(list[item].id, list[item].user_title)
+                }
               >
                 <td>{num}</td>
                 <td>{list[item].user_title}</td>
