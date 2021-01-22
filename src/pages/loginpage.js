@@ -1,4 +1,6 @@
 import React from 'react';
+import './auth.css';
+// import { Redirect } from 'react-router-dom';
 
 import {
   Button,
@@ -52,12 +54,14 @@ class LoginPage extends React.Component {
         console.log(res);
         alert('로그인 되었습니다');
       })
-      .then(this.props.history.push('/storage'));
+      .then(() => {
+        window.location.href = '/storage';
+      });
   }
 
   render() {
     return (
-      <Form className='login-form'>
+      <Form className='login-form '>
         <h1>
           <a className='font-weight-bold text-decoration-none' href='/'>
             Brainwave WEB

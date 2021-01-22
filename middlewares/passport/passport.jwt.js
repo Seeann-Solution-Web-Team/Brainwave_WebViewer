@@ -17,9 +17,9 @@ module.exports = {
     };
   },
   verify: async (payload, done) => {
-    console.log('payload', payload.id);
+    console.log('payload', payload);
     db.query(
-      `SELECT BIN_TO_UUID(id), name, email FROM user WHERE id=UUID_TO_BIN(?)`,
+      `SELECT BIN_TO_UUID(id, true), name, email FROM user WHERE id=UUID_TO_BIN(?)`,
       [payload.id],
       (error, result) => {
         if (error) {
@@ -28,7 +28,7 @@ module.exports = {
           return done(null, false);
         } else {
           const user = {
-            id: result[0]['BIN_TO_UUID(id)'],
+            id: result[0]['BIN_TO_UUID(id, true)'],
             username: result[0].name,
             email: result[0].email,
           };

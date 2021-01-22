@@ -64,7 +64,7 @@ exports.login = (req, res, next) => {
             id: user.id,
           },
           'secret',
-          { expiresIn: '5m' }
+          { expiresIn: '30m' }
         );
         res.cookie('token', token, { httpOnly: true });
         return res.json({ token });

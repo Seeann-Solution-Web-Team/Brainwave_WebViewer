@@ -8,8 +8,25 @@ const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
 exports.readFileList = (req, res) => {
-  db.query(`SELECT * FROM rhs_data`, (error, result) => {
-    console.log(result);
-  });
-  res.json({ a: 'asd' });
+  console.log('readfile userId: ', req.user.id);
+  db.query(
+    `SELECT JSON_OBJECT('id', BIN_TO_UUID(id, true) ,'user_title', user_title, 'name', name, 'date', DATE(date)) FROM rhs_data WHERE owner_id = UUID_TO_BIN(?, true) ORDER BY TIME(date) DESC`,
+    [req.user.id],
+    (error, result) => {
+      if (error) {
+        throw error;
+      }
+      let userFileJSON = [];
+      result.forEach((element) => {
+        userFileJSON.push(
+          JSON.parse(
+            element[
+              `JSON_OBJECT('id', BIN_TO_UUID(id, true) ,'user_title', user_title, 'name', name, 'date', DATE(date))`
+            ]
+          )
+        );
+      });
+      res.json(userFileJSON);
+    }
+  );
 };

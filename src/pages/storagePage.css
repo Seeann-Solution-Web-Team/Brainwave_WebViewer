@@ -1,0 +1,17 @@
+.storage_container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10vw;
+}
+
+.storage_list {
+  width: 100%;
+}
+
+.storage_button {
+  display: flex;
+  justify-content: left;
+  width: 100%;
+}
