@@ -10,7 +10,7 @@ class WaveGraphPlayer extends React.Component{
         this.state = {
             channels: 32,
             count: 1000,
-            speed: 20,
+            speed: 1.0,
             canvasWidth: 1600,
             isPlaying: false
         };
@@ -24,7 +24,7 @@ class WaveGraphPlayer extends React.Component{
         this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
         this.onResize = this.onResize.bind(this);
 
-        this.apply = this.apply.bind(this);
+        this.applyFile = this.applyFile.bind(this);
     }
 
     componentDidMount(){
@@ -42,12 +42,12 @@ class WaveGraphPlayer extends React.Component{
         window.removeEventListener("keydown", this.onKeyDown);
     }
 
-    apply (file){
+    applyFile (file){
         //apply to CanvasGraph
         var ampData = file.getNormalizedAmpData();
         this.setState({channels: ampData.length});
         this.currentFile = file;
-        this.graphRef.setpeaks(ampData);
+        this.graphRef.setfile(file);
     }
 
     onPlayStateChanged(){
@@ -61,11 +61,11 @@ class WaveGraphPlayer extends React.Component{
         if (this.currentFile === null)
             return;
         
-        var current = Math.round(p * this.currentFile.recordLength);
-        var recordMin = (Math.round(this.currentFile.recordLength / 60)).toString().padStart(2, '0');
+        var current = Math.floor(p * this.currentFile.recordLength);
+        var recordMin = (Math.floor(this.currentFile.recordLength / 60)).toString().padStart(2, '0');
         var recordSec = (this.currentFile.recordLength % 60).toString().padStart(2, '0');
 
-        var currentMin = (Math.round(current / 60)).toString().padStart(2, '0');
+        var currentMin = (Math.floor(current / 60)).toString().padStart(2, '0');
         var currentSec = (current % 60).toString().padStart(2, '0');
 
         this.timeLabel.innerHTML = currentMin + ':' + currentSec + '/' + recordMin + ':' + recordSec;
@@ -78,6 +78,10 @@ class WaveGraphPlayer extends React.Component{
     onKeyDown(e){
         if (e.keyCode === 32)
             this.graphRef.togglePlay();
+        else if (e.keyCode === 37)
+            this.graphRef.prev();
+        else if (e.keyCode === 39)
+            this.graphRef.next();
     }
 
     onResize(){
@@ -95,14 +99,21 @@ class WaveGraphPlayer extends React.Component{
     }
 
     setSpeed(s){
-        this.setState({speed: s * 1});
+        this.setState({speed: s * 1.0});
+    }
+
+    setChannelSelection(selection){
+        this.graphRef.setchannelsenabled(selection);
+        this.setState({channels: selection.length});
     }
 
     render(){
+        /*
         var btnStyle={
             height: '50px',
             width: '50px'
         }
+        */
         var labelStyle={
             fontSize: '18px',
             display: 'flex',
@@ -112,18 +123,21 @@ class WaveGraphPlayer extends React.Component{
         return(
         <div>
             <CanvasGraph ref={ref=>{this.graphRef = ref;}}
-            height='25' width={this.state.canvasWidth}
+            height={25} width={this.state.canvasWidth} margin={10}
             channels={this.state.channels} count={this.state.count} speed={this.state.speed} 
             strokeColor="#FFFFFF"
             onPlayStateChanged={this.onPlayStateChanged}
             onOffsetChanged={this.onOffsetChanged}/>
             <div>
                 <label id='timeLabel' style={labelStyle}>00:00/00:00</label>
-                <button onClick={this.onPlayButtonClicked} style={btnStyle}>
-                    {this.state.isPlaying ? "stop" : "play"}
-                </button>
             </div>
         </div>);
+
+        /*
+        <button onClick={this.onPlayButtonClicked} style={btnStyle}>
+                    {this.state.isPlaying ? "stop" : "play"}
+                </button>
+         */
     }
 }
 
@@ -180,14 +194,93 @@ class FileList extends React.Component{
     }
 }
 
+class ChannelList extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            channelNameList: []
+        }
+
+        this.channelNameList_onchange = this.channelNameList_onchange.bind(this);
+    }
+
+    setChannelList(arr){
+        var nameArr = [];
+        var i = 0;
+        for (i = 0; i < arr.length; i++){
+            nameArr.push(arr[i].customName);
+        }
+
+        this.setState({
+            channelNameList: nameArr
+        });
+
+        //Deselect All
+        var elements = document.getElementById("channelNameList").options;
+
+        for (i = 0; i < elements.length; i++){
+            elements[i].selected = false;
+        }
+    }
+
+    channelNameList_onchange(){
+        var select = document.getElementById("channelNameList");
+        var selectedIdx = [];
+        var len = select.options.length;
+
+        for (var i = 0; i < len; i++){
+            if (select.options[i].selected){
+                selectedIdx.push(i);
+            }
+        }
+
+        this.props.onSelectionChanged(selectedIdx);
+    }
+
+    render(){
+        var options = [];
+        for (var i = 0; i < this.state.channelNameList.length; i++){
+            options.push(
+                <option key={i} value={this.state.channelNameList[i]}>
+                    {this.state.channelNameList[i]}
+                </option>);
+        }
+
+        return (
+        <select id="channelNameList" className="files" onChange={this.channelNameList_onchange} multiple>
+            {options}
+        </select>);
+    }
+}
+
 class PlayerController extends React.Component{
 
     constructor(props){
         super(props);
         
+        this.play_onclick = this.play_onclick.bind(this);
+        this.stop_onclick = this.stop_onclick.bind(this);
+        this.replay_onclick = this.replay_onclick.bind(this);
+
         this.count_select_onchange = this.count_select_onchange.bind(this);
         this.channel_select_onchange = this.channel_select_onchange.bind(this);
         this.speed_select_onchange = this.speed_select_onchange.bind(this);
+    }
+
+    play_onclick(e){
+        if (this.props.onPlayButtonClicked !== undefined)
+            this.props.onPlayButtonClicked();
+    }
+
+    stop_onclick(e){
+        if (this.props.onPlayButtonClicked !== undefined)
+            this.props.onStopButtonClicked();
+    }
+
+    replay_onclick(e){
+        if (this.props.onPlayButtonClicked !== undefined)
+            this.props.onReplayButtonClicked();
     }
 
     count_select_onchange (){
@@ -209,12 +302,21 @@ class PlayerController extends React.Component{
         var st = {
             fontSize: '24px',
         }
+        var btnStyle={
+            height: '50px',
+            width: '50px'
+        }
 
         return (
         <div className="player_Controller">
             <span style={st}>아아아ㅏㅏ아아아메뉴우우ㅜ우ㅡ</span>
-            
             <br/>
+            <br/>
+            <div>
+                <button className='btn btn-secondary' onClick={this.play_onclick}>Play</button>
+                <button className='btn btn-secondary' onClick={this.stop_onclick}>Stop</button>
+                <button className='btn btn-secondary' onClick={this.replay_onclick}>Rewind</button>
+            </div>
             <br/>
             <span>확대</span>
             <select id="count_select" defaultValue='1000' onChange={this.count_select_onchange}>
@@ -227,26 +329,16 @@ class PlayerController extends React.Component{
             </select>
 
             <br/>
-            <span>채널</span>
-            <select id="channel_select" defaultValue='32' onChange={this.channel_select_onchange}>
-                <option value='1'>1</option>
-                <option value='2'>2</option>
-                <option value='4'>4</option>
-                <option value='8'>8</option>
-                <option value='16'>16</option>
-                <option value='32'>32</option>
-            </select>
-
             <br/>
             <span>재생 속도</span>
-            <select id="speed_select" defaultValue='20' onChange={this.speed_select_onchange}>
-                <option value='1'>1</option>
-                <option value='5'>5</option>
-                <option value='10'>10</option>
-                <option value='20'>20</option>
-                <option value='30'>30</option>
-                <option value='40'>40</option>
-                <option value='50'>50</option>
+            <select id="speed_select" defaultValue='1.0' onChange={this.speed_select_onchange}>
+                <option value='0.1'>x0.1</option>
+                <option value='0.25'>x0.25</option>
+                <option value='0.5'>x0.5</option>
+                <option value='1.0'>x1.0</option>
+                <option value='1.25'>x1.25</option>
+                <option value='1.5'>x1.5</option>
+                <option value='2.0'>x2.0</option>
             </select>
 
             <br/><br/><br/>
@@ -256,6 +348,18 @@ class PlayerController extends React.Component{
             <br/><br/>
             <span>대충 메모 들어갈자리3</span>
         </div>);
+
+        /*
+        <span>채널</span>
+        <select id="channel_select" defaultValue='32' onChange={this.channel_select_onchange}>
+            <option value='1'>1</option>
+            <option value='2'>2</option>
+            <option value='4'>4</option>
+            <option value='8'>8</option>
+            <option value='16'>16</option>
+            <option value='32'>32</option>
+        </select>
+        */
     }
 }
 
@@ -263,13 +367,43 @@ class Viewer extends React.Component {
     constructor(props){
         super(props);
         this.playerRef = React.createRef();
+        this.channelListRef = React.createRef();
+        this.state={isLoading: false};
+
+        this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
+        this.onStopButtonClicked = this.onStopButtonClicked.bind(this);
+        this.onReplayButtonClicked = this.onReplayButtonClicked.bind(this);
 
         this.onCountChanged = this.onCountChanged.bind(this);
         this.onChannelChanged = this.onChannelChanged.bind(this);
         this.onSpeedChanged = this.onSpeedChanged.bind(this);
+        this.onSelectionChanged = this.onSelectionChanged.bind(this);
 
         this.onFileLoadStart = this.onFileLoadStart.bind(this);
+        this.onLoadingProgressChanged = this.onLoadingProgressChanged.bind(this);
         this.onFileLoaded = this.onFileLoaded.bind(this);
+    }
+
+    componentDidMount(){
+        if (this.props.match.params.filePath === undefined)
+            return;
+
+        //Load File
+        var rhs = new RHSFile();
+        this.setState({isLoading: true});
+        rhs.load(this.props.match.params.filePath, this.onFileLoaded, this.onLoadingProgressChanged);
+    }
+
+    onPlayButtonClicked(){
+        this.playerRef.graphRef.play();
+    }
+
+    onStopButtonClicked(){
+        this.playerRef.graphRef.stop();
+    }
+
+    onReplayButtonClicked(){
+        this.playerRef.graphRef.setoffset(0.0);
     }
     
     onCountChanged (v){
@@ -284,33 +418,84 @@ class Viewer extends React.Component {
         this.playerRef.setSpeed(v);
     }
 
+    onSelectionChanged(arr){
+        console.log(arr);
+        this.playerRef.setChannelSelection(arr);
+    }
+
     onFileLoadStart(){
         this.playerRef.currentFile = null;
         this.playerRef.graphRef.stop();
+        this.setState({isLoading: true});
+    }
+
+    onLoadingProgressChanged(file, prog){
+        console.log(prog + '%');
+
+        var loadingTxt = document.getElementById("loadingTxt");
+
+        if (loadingTxt !== undefined){
+            loadingTxt.innerHTML = 'LOADING (' + (Math.floor(prog * 10) * 0.1) + '%)';
+        }
     }
 
     onFileLoaded(file){
-        this.playerRef.graphRef.stop();
-        this.playerRef.apply(file);
+        if (file.isInitialized){
+            this.playerRef.graphRef.stop();
+            this.playerRef.applyFile(file);
+
+            this.channelListRef.current.setChannelList(file.getChannelData());
+        }
+        else{
+            alert('Failed to get file ' + file.path);
+        }
+
+        this.setState({isLoading: false});
     }
 
     render(){
+        const loadingScreenStyle={
+            margin: '0',
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: '#282c3480',
+            zIndex: '2',
+            position: 'absolute'
+        }
+
+        const loadingTxtStyle={
+            top: '50%',
+            fontSize: '24px',
+            transform: 'translateY(-50%)',
+            position: 'absolute'
+        }
+
         return (
         <div className="Viewer">
             <div className="Viewer_Menu">
                 <PlayerController
+                onPlayButtonClicked={this.onPlayButtonClicked}
+                onStopButtonClicked={this.onStopButtonClicked}
+                onReplayButtonClicked={this.onReplayButtonClicked}
                 onCountChanged={this.onCountChanged}
                 onChannelChanged={this.onChannelChanged}
                 onSpeedChanged={this.onSpeedChanged}/>
-                <FileList 
+                <ChannelList 
+                ref={this.channelListRef}
                 onFileLoadStart={this.onFileLoadStart} 
-                onFileLoaded={this.onFileLoaded}/>
+                onFileLoaded={this.onFileLoaded}
+                onSelectionChanged={this.onSelectionChanged}/>
             </div>
             <div className="Viewer_Graph">
-                <img src={logo} className="logo" alt="logo" 
-                width='100px' height='100px'/>
+                <img src={logo} draggable='false' className="logo" alt="logo" 
+                width='50px' height='50px'/>
                 <WaveGraphPlayer ref={ref=>{this.playerRef = ref;}} />
             </div> 
+            {this.state.isLoading ? 
+            (<div style={loadingScreenStyle}>
+                <span id='loadingTxt' style={loadingTxtStyle}>LOADING</span>
+            </div>) : 
+            (<div/>)}
         </div>);
     }
 }

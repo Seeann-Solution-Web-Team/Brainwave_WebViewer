@@ -1,6 +1,7 @@
 class RHSFile{
     constructor(){
         this.dataView = null;
+        this.isInitialized = false;
         this.filePos = -1;
         this.onProgress = this.onProgress.bind(this);
         this.onLoad = this.onLoad.bind(this);
@@ -276,6 +277,7 @@ class RHSFile{
         this.recordLength = Math.round((blockCount * 128) / this.sampleRate);
         console.log('record length is ' + this.recordLength + 'seconds');
 
+        this.isInitialized = true;
         console.log('rhs file is loaded successfully');
     }
     
@@ -374,6 +376,22 @@ class RHSFile{
         }
 
         return nor;
+    }
+
+    getChannelData(){
+        var arr = [];
+        var i = 0;
+        var j = 0;
+
+        for (i = 0; i < this.signalGroups.length; i++){
+            for (j = 0; j < this.signalGroups[i].channels.length; j++){
+                if (this.signalGroups[i].channels[j].signalType === 0){
+                    arr.push(this.signalGroups[i].channels[j]);
+                }
+            }
+        }
+
+        return arr;
     }
 
     max(arr){

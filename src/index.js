@@ -1,15 +1,17 @@
-import React from 'react';
+//import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import './index.css';
+import 'bootstrap/dist/css/bootstrap.css'
+//import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+import routes from './routes'
 
-const app = (
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+/*
+const app = <React.StrictMode>
+                <App/>
+            </React.StrictMode>;
+*/
 
-ReactDOM.render(app, document.getElementById('root'));
+ReactDOM.render(routes, document.getElementById('root'));
 reportWebVitals();
