@@ -1,35 +1,60 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import DataTable from '../components/DataTable';
-import CustomModal from '../components/CustomModal';
+import CustomModal from '../components/modals/CustomModal';
 import './storagePage.css';
+import axios from 'axios';
 
 class StoragePage extends React.Component {
   constructor(props) {
     super(props);
+
+    this.getSelectedFileTitle = this.getSelectedFileTitle.bind(this);
     this.state = {
-      modalShow: true,
-      modalType: null,
+      modalShow: false,
+      modalType: '',
       selectedFileId: null,
       selectedFileTitle: null,
       uploadFile: null,
       uploadFileTitle: null,
+      renameFileTitle: null,
       dataList: null,
     };
   }
 
   getUserFileList = () => {
-    fetch('/api/storage/filelist')
-      .then((res) => res.json())
+    axios
+      .get('/api/storage/filelist')
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
         this.setState({
-          dataList: res,
+          dataList: res.data,
         });
+      })
+      .catch((error) => {
+        if (error.response.status == 401) {
+          console.log(error.response.status);
+          axios
+            .get('/api/auth/accessToken')
+            .then(() => {
+              this.getUserFileList();
+            })
+            .catch((error2) => {
+              if (error2.response.status == 401) {
+                window.localStorage.clear();
+                this.props.history.push('/login');
+              }
+            });
+        }
       });
   };
+
   componentDidMount = (e) => {
-    this.getUserFileList();
+    if (!window.localStorage.getItem('loggedIn')) {
+      window.location.href = '/login';
+    } else {
+      this.getUserFileList();
+    }
   };
 
   getSelectedFileId = (Id) => {
@@ -68,7 +93,7 @@ class StoragePage extends React.Component {
         method: 'POST',
         body: formData,
       };
-      fetch('/api/storage/userfile', upload_options).then((result) => {
+      axios('/api/storage/userfile', upload_options).then((result) => {
         console.log('handleUpload result:', result);
         this.setModalShow(false);
         this.setState({
@@ -80,8 +105,20 @@ class StoragePage extends React.Component {
     }
   };
 
-  handleFileRename = (e) => {
-    console.log('handle fi');
+  handleRename = (e) => {
+    console.log('handle rename file', this.state.renameFileTitle);
+    const renameData = {
+      filename: this.state.renameFileTitle,
+      fileId: this.state.selectedFileId,
+    };
+    axios.put('/api/storage/userfile', renameData).then((result) => {
+      console.log('handleRename result:', result);
+      this.setModalShow(false);
+      this.setState({
+        renameFileTitle: null,
+      });
+      this.getUserFileList();
+    });
   };
 
   handleFileRemove = (e) => {
@@ -123,16 +160,14 @@ class StoragePage extends React.Component {
     }
   };
 
-  getDataList(e) {}
-
   setModalShow = (show, type) => {
     this.setState({
-      modalShow: show,
       modalType: type,
+      modalShow: show,
     });
   };
 
-  handleFileInput = (e) => {
+  handleUploadFileInput = (e) => {
     let files = e.target.files;
     console.log('fileinput: ', files);
 
@@ -143,9 +178,15 @@ class StoragePage extends React.Component {
     }
   };
 
-  handleFileTitle = (e) => {
+  handleUploadFileTitle = (e) => {
     this.setState({
       uploadFileTitle: e.target.value,
+    });
+  };
+
+  handleRenameFileTitle = (e) => {
+    this.setState({
+      renameFileTitle: e.target.value,
     });
   };
 
@@ -156,14 +197,18 @@ class StoragePage extends React.Component {
           className='storage_list'
           dataList={this.state.dataList}
           getSelectedFileId={this.getSelectedFileId}
+          getSelectedFileTitle={this.getSelectedFileTitle}
         />
         <CustomModal
           show={this.state.modalShow}
           onHide={() => this.setModalShow(false)}
           type={this.state.modalType}
           handleUpload={() => this.handleUpload()}
-          handleFileInput={this.handleFileInput}
-          handleFileTitle={this.handleFileTitle}
+          handleUploadFileInput={this.handleUploadFileInput}
+          handleUploadFileTitle={this.handleUploadFileTitle}
+          handleRename={this.handleRename}
+          handleRenameFileTitle={this.handleRenameFileTitle}
+          selectedFileTitle={this.state.selectedFileTitle}
         />
         <div className='storage_button'>
           <Button
@@ -175,7 +220,6 @@ class StoragePage extends React.Component {
           <Button
             variant='outline-primary'
             onClick={() => this.setModalShow(true, 'rename')}
-            selectedFileTitle={this.state.selectedFileTitle}
           >
             Rename
           </Button>
