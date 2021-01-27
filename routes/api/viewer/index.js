@@ -2,7 +2,6 @@ const router = require('express').Router();
 
 router.get('/fileId/:fileId', (req, res) => {
   let fileId = req.params.fileId;
-  console.log('send file error');
   if (fileId === null || req.user.id === null) {
     console.log('send file error');
     res.sendStatus(400);
