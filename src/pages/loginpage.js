@@ -1,6 +1,6 @@
 import React from 'react';
 import './auth.css';
-// import { Redirect } from 'react-router-dom';
+import axios from 'axios';
 
 import {
   Button,
@@ -24,6 +24,12 @@ class LoginPage extends React.Component {
     };
   }
 
+  componentDidMount() {
+    if (window.localStorage.getItem('loggedIn')) {
+      this.props.history.push('/storage');
+    }
+  }
+
   handleEmailChange(e) {
     this.setState({ email: e.target.value });
   }
@@ -40,23 +46,16 @@ class LoginPage extends React.Component {
       password: this.state.password,
     };
 
-    const login_POST = {
-      method: 'POST',
-      body: JSON.stringify(loginInfo),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    fetch('/api/auth/login', login_POST)
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
+    axios.post('/api/auth/login', loginInfo).then((res) => {
+      if (res.status == 401) {
+        console.log('token expired');
+      } else {
         alert('로그인 되었습니다');
-      })
-      .then(() => {
+        window.localStorage.setItem('loggedIn', true);
+        window.localStorage.setItem('username', res.data.username);
         window.location.href = '/storage';
-      });
+      }
+    });
   }
 
   render() {
