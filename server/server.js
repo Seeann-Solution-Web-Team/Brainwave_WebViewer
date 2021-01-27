@@ -32,7 +32,7 @@ app.use(cors());
 // app.use(passport.session());
 app.use(passport.initialize());
 passportConfig();
-app.use(passportJwt.authenticateJWT);
+// app.use(passport.authenticate('jwt', { session: false }));
 
 // app.get('*', (req, res) => {
 //   console.log(req.user);
@@ -41,12 +41,12 @@ app.use(passportJwt.authenticateJWT);
 app.use('/api', require('../routes/api'));
 
 app.use((req, res, next) => {
-  res.status(404).send("Sorry can't find that");
+  res.status(404).end();
 });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Something broke');
+  res.status(500).end();
 });
 
 app.listen(port, () => {

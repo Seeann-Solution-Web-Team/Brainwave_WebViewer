@@ -59,16 +59,58 @@ exports.login = (req, res, next) => {
       if (err || !user) return res.status(400).end();
       req.login(user, { session: false }, (error) => {
         if (error) next(error);
-        const token = jwt.sign(
+        const accessToken = jwt.sign(
           {
             id: user.id,
           },
           'secret',
-          { expiresIn: '30m' }
+          { expiresIn: '1m' }
         );
-        res.cookie('token', token, { httpOnly: true });
-        return res.json({ token });
+        const refreshToken = jwt.sign(
+          {
+            id: user.id,
+          },
+          'secret',
+          { expiresIn: '30d' }
+        );
+        res.cookie('accessToken', accessToken, { httpOnly: true });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true });
+        res.json({
+          username: user.username,
+        });
       });
     }
   )(req, res);
+};
+
+exports.logout = (req, res) => {
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+  res.end(200);
+};
+
+exports.accessToken = (req, res) => {
+  let refreshToken = null;
+  if (req && req.cookies) {
+    refreshToken = req.cookies.refreshToken;
+  }
+  // verify refresh token,
+  // if not, delete from db, clear both cookies and return status 401
+  jwt.verify(refreshToken, 'secret', (err, decoded) => {
+    if (err) {
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+      res.status(401).end();
+    } else {
+      const newAccessToken = jwt.sign(
+        {
+          id: decoded.id,
+        },
+        'secret',
+        { expiresIn: '30m' }
+      );
+      res.cookie('accessToken', newAccessToken, { httpOnly: true });
+      res.status(200).end();
+    }
+  });
 };

@@ -121,16 +121,7 @@ class viewer extends React.Component {
 
     return (
       <div className='main_container'>
-        <div className='main_nav'>
-          <Navbar bg='dark' variant='dark'>
-            <Navbar.Brand href='/'>Brain - WEB</Navbar.Brand>
-            <Navbar.Collapse className='justify-content-end'>
-              <Navbar.Text>
-                <a href='/login'>Sign in</a>
-              </Navbar.Text>
-            </Navbar.Collapse>
-          </Navbar>
-        </div>
+        <div className='main_nav'></div>
 
         <div className='main__contents'>
           <div className='menu'>
