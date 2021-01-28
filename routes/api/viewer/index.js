@@ -4,7 +4,7 @@ router.get('/fileId/:fileId', (req, res) => {
   let fileId = req.params.fileId;
   if (fileId === null || req.user.id === null) {
     console.log('send file error');
-    res.sendStatus(400);
+    res.status(401).end();
   } else {
     console.log('send file:', req.params.fileId);
     res.sendFile(

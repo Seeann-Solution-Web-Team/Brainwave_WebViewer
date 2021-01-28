@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 class RHSFile {
   constructor() {
     this.dataView = null;
@@ -52,7 +54,19 @@ class RHSFile {
   }
 
   onError(e) {
-    console.log('Error : ' + this.request.statusText);
+    if (this.request.status === 401) {
+      axios
+        .get('/api/auth/accessToken')
+        .then(() => {
+          this.request.open('GET', 'api/viewer/fileId/' + fileId, true);
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            window.localStorage.clear();
+            window.location.href = '/login';
+          }
+        });
+    }
   }
 
   parse() {

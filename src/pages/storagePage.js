@@ -93,15 +93,33 @@ class StoragePage extends React.Component {
         method: 'POST',
         body: formData,
       };
-      axios('/api/storage/userfile', upload_options).then((result) => {
-        console.log('handleUpload result:', result);
-        this.setModalShow(false);
-        this.setState({
-          uploadFileTitle: null,
-          uploadFile: null,
+
+      axios('/api/storage/userfile', upload_options)
+        .then((result) => {
+          console.log('handleUpload result:', result);
+          this.setModalShow(false);
+          this.setState({
+            uploadFileTitle: null,
+            uploadFile: null,
+          });
+          this.getUserFileList();
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            console.log(error.response.status);
+            axios
+              .get('/api/auth/accessToken')
+              .then(() => {
+                this.handleUpload();
+              })
+              .catch((error2) => {
+                if (error2.response.status == 401) {
+                  window.localStorage.clear();
+                  this.props.history.push('/login');
+                }
+              });
+          }
         });
-        this.getUserFileList();
-      });
     }
   };
 
@@ -111,14 +129,32 @@ class StoragePage extends React.Component {
       filename: this.state.renameFileTitle,
       fileId: this.state.selectedFileId,
     };
-    axios.put('/api/storage/userfile', renameData).then((result) => {
-      console.log('handleRename result:', result);
-      this.setModalShow(false);
-      this.setState({
-        renameFileTitle: null,
+    axios
+      .put('/api/storage/userfile', renameData)
+      .then((result) => {
+        console.log('handleRename result:', result);
+        this.setModalShow(false);
+        this.setState({
+          renameFileTitle: null,
+        });
+        this.getUserFileList();
+      })
+      .catch((error) => {
+        if (error.response.status == 401) {
+          console.log(error.response.status);
+          axios
+            .get('/api/auth/accessToken')
+            .then(() => {
+              this.handleRename();
+            })
+            .catch((error2) => {
+              if (error2.response.status == 401) {
+                window.localStorage.clear();
+                this.props.history.push('/login');
+              }
+            });
+        }
       });
-      this.getUserFileList();
-    });
   };
 
   handleFileRemove = (e) => {
@@ -136,13 +172,30 @@ class StoragePage extends React.Component {
           'Content-Type': 'application/json',
         },
       };
-      fetch(`/api/storage/userfile`, delete_options).then((res) => {
-        console.log('handle delete: ', res);
-        this.setState({
-          selectedFileId: null,
+      fetch(`/api/storage/userfile`, delete_options)
+        .then((res) => {
+          console.log('handle delete: ', res);
+          this.setState({
+            selectedFileId: null,
+          });
+          this.getUserFileList();
+        })
+        .catch((error) => {
+          if (error.response.status == 401) {
+            console.log(error.response.status);
+            axios
+              .get('/api/auth/accessToken')
+              .then(() => {
+                this.handleFileRemove();
+              })
+              .catch((error2) => {
+                if (error2.response.status == 401) {
+                  window.localStorage.clear();
+                  this.props.history.push('/login');
+                }
+              });
+          }
         });
-        this.getUserFileList();
-      });
     } else {
       alert('Please select a file to delete');
     }
