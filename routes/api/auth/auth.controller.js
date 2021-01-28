@@ -64,7 +64,7 @@ exports.login = (req, res, next) => {
             id: user.id,
           },
           'secret',
-          { expiresIn: '1m' }
+          { expiresIn: '30m' }
         );
         const refreshToken = jwt.sign(
           {
