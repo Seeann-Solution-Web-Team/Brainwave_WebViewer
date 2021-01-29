@@ -113,6 +113,7 @@ class RHSFile{
         console.log('version: ' + this.version);
         console.log('sample rate: ' + this.sampleRate);
         console.log('DSP Enabled: ' + this.DSPEnabled);
+        console.log('Notch Filter Mode : ' + this.notchFilterMode);
         
         //==Read signal group and channel descriptions==
         this.signalGroups = [];
@@ -361,6 +362,19 @@ class RHSFile{
         return size;
     }
 
+    getRawAmpData(){
+        var nor = [];
+
+        for (var i = 0; i < this.ampData.length; i++){
+            nor.push([]);
+            for (var j = 0; j < this.timestamps.length; j++){
+                nor[i].push(this.ampData[i][j]);
+            }
+        }
+
+        return nor;
+    }
+
     getNormalizedAmpData(){
         var nor = [];
 
@@ -376,6 +390,52 @@ class RHSFile{
         }
 
         return nor;
+    }
+
+    //Notch Filter
+    getFilteredAmpData(notchFreq, bandwidth, sampleFreq){
+        var arr = this.getRawAmpData();
+        var filtered = [];
+
+        // Calculate biquad IIR filter coefficients.
+        var d = Math.exp(-Math.PI * bandwidth / sampleFreq);
+        
+        var a1 = -(1.0 + d * d) * Math.cos(2.0 * Math.PI * notchFreq / sampleFreq);
+        var a2 = d * d;
+        var b0 = (1 + d * d) / 2.0;
+        var b1 = a1;
+        var b2 = b0;
+
+        
+        var value = 0;
+        for (var c = 0; c < arr.length; c++){
+            filtered.push([]);
+            filtered[c].push(0);
+            filtered[c].push(0);
+
+            for (var i = 2; i < arr[c].length; i++){
+                value = b0 * arr[c][i] +
+                        b1 * arr[c][i - 1] + 
+                        b2 * arr[c][i - 2] -
+                        a1 * filtered[c][i - 1] -
+                        a2 * filtered[c][i - 2];
+                filtered[c].push(value);
+            }
+        }
+
+        var normalized = [];
+        for (c = 0; c < filtered.length; c++){
+            var max = this.max(filtered[c]);
+            var min = this.min(filtered[c]);
+            var mmax = Math.max(max, Math.abs(min));
+
+            normalized.push([]);
+            for (i = 0; i < filtered[c].length; i++){
+                normalized[c].push(filtered[c][i] / mmax);
+            }
+        }
+
+        return normalized;
     }
 
     getChannelData(){

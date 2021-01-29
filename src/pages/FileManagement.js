@@ -98,9 +98,6 @@ class FileManagement extends React.Component{
                 </div>
             </div>
         </div>);
-
-        //<span>여기도 뭐 하나 적어놔야 할것같은데 뭘 적어야 잘 적었다고 소문이 날까</span>
-
     }
 }
 

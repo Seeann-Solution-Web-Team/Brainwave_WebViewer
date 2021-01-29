@@ -2,16 +2,18 @@ import React from 'react';
 import logo from '.././logo.svg';
 import './viewer.css';
 import CanvasGraph from './CanvasGraph';
+import GLGraph from './GLGraph'
 import RHSFile from './RHSFile'
 
 class WaveGraphPlayer extends React.Component{
     constructor(props){
         super(props);
         this.state = {
+            timescale: 1000,
             channels: 32,
-            count: 1000,
             speed: 1.0,
             canvasWidth: 1600,
+            canvasHeight: 800,
             isPlaying: false
         };
 
@@ -21,6 +23,7 @@ class WaveGraphPlayer extends React.Component{
         this.onPlayStateChanged = this.onPlayStateChanged.bind(this);
         this.onOffsetChanged = this.onOffsetChanged.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
+        this.onWheel = this.onWheel.bind(this);
         this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
         this.onResize = this.onResize.bind(this);
 
@@ -29,17 +32,20 @@ class WaveGraphPlayer extends React.Component{
 
     componentDidMount(){
         this.setState({isPlaying: this.graphRef.isPlaying});
-        this.onResize();
         //fetch('http://localhost:3000/api');
         window.addEventListener("resize", this.onResize);
         window.addEventListener("keydown", this.onKeyDown);
+        document.getElementById("gridCanvas").addEventListener("wheel", this.onWheel);
 
         this.timeLabel = document.getElementById('timeLabel');
+
+        this.onResize();
     }
 
     componentWillUnmount(){
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("keydown", this.onKeyDown);
+        document.getElementById("gridCanvas").removeEventListener("wheel", this.onWheel);
     }
 
     applyFile (file){
@@ -84,9 +90,15 @@ class WaveGraphPlayer extends React.Component{
             this.graphRef.next();
     }
 
+    onWheel(e){
+          this.graphRef.addverticalscroll(e.deltaY);
+    }
+
     onResize(){
+        var rt = this.graphRef.getCanvas().getBoundingClientRect();
         this.setState({
-            canvasWidth: this.graphRef.getCanvas().getBoundingClientRect().width
+            canvasWidth: rt.width,
+            canvasHeight: rt.height
         });
     }
 
@@ -94,8 +106,8 @@ class WaveGraphPlayer extends React.Component{
         this.setState({channels: c});
     }
 
-    setPeakCount (c){
-        this.setState({count: c});
+    setTimeScale (v){
+        this.setState({timescale: v});
     }
 
     setSpeed(s){
@@ -114,6 +126,10 @@ class WaveGraphPlayer extends React.Component{
             width: '50px'
         }
         */
+        var divStyle={
+            height: '100%'
+        }
+
         var labelStyle={
             fontSize: '18px',
             display: 'flex',
@@ -121,10 +137,10 @@ class WaveGraphPlayer extends React.Component{
         }
 
         return(
-        <div>
-            <CanvasGraph ref={ref=>{this.graphRef = ref;}}
-            height={25} width={this.state.canvasWidth} margin={10}
-            channels={this.state.channels} count={this.state.count} speed={this.state.speed} 
+        <div style={divStyle}>
+            <GLGraph ref={ref=>{this.graphRef = ref;}}
+            width={this.state.canvasWidth} height={this.state.canvasHeight} margin={10}
+            channels={this.state.channels} timescale={this.state.timescale} speed={this.state.speed} 
             strokeColor="#FFFFFF"
             onPlayStateChanged={this.onPlayStateChanged}
             onOffsetChanged={this.onOffsetChanged}/>
@@ -141,6 +157,7 @@ class WaveGraphPlayer extends React.Component{
     }
 }
 
+/*
 class FileList extends React.Component{
     constructor(props){
         super(props);
@@ -193,6 +210,7 @@ class FileList extends React.Component{
         </select>);
     }
 }
+*/
 
 class ChannelList extends React.Component{
     constructor(props){
@@ -263,7 +281,7 @@ class PlayerController extends React.Component{
         this.stop_onclick = this.stop_onclick.bind(this);
         this.replay_onclick = this.replay_onclick.bind(this);
 
-        this.count_select_onchange = this.count_select_onchange.bind(this);
+        this.timescale_select_onchange = this.timescale_select_onchange.bind(this);
         this.channel_select_onchange = this.channel_select_onchange.bind(this);
         this.speed_select_onchange = this.speed_select_onchange.bind(this);
     }
@@ -283,9 +301,9 @@ class PlayerController extends React.Component{
             this.props.onReplayButtonClicked();
     }
 
-    count_select_onchange (){
-        if (this.props.onCountChanged !== undefined)
-            this.props.onCountChanged(document.getElementById("count_select").value);
+    timescale_select_onchange (){
+        if (this.props.onTimeScaleChanged !== undefined)
+            this.props.onTimeScaleChanged(document.getElementById("timescale_select").value);
     }
 
     channel_select_onchange (){
@@ -302,10 +320,6 @@ class PlayerController extends React.Component{
         var st = {
             fontSize: '24px',
         }
-        var btnStyle={
-            height: '50px',
-            width: '50px'
-        }
 
         return (
         <div className="player_Controller">
@@ -318,14 +332,15 @@ class PlayerController extends React.Component{
                 <button className='btn btn-secondary' onClick={this.replay_onclick}>Rewind</button>
             </div>
             <br/>
-            <span>확대</span>
-            <select id="count_select" defaultValue='1000' onChange={this.count_select_onchange}>
-                <option value='500'>500</option>
-                <option value='1000'>1000</option>
-                <option value='2000'>2000</option>
-                <option value='3000'>3000</option>
-                <option value='4000'>4000</option>
-                <option value='5000'>5000</option>
+            <span>timescale</span>
+            <select id="timescale_select" defaultValue='1000' onChange={this.timescale_select_onchange}>
+                <option value='1'>1ms</option>
+                <option value='50'>50ms</option>
+                <option value='250'>250ms</option>
+                <option value='500'>500ms</option>
+                <option value='1000'>1000ms</option>
+                <option value='2500'>2500ms</option>
+                <option value='5000'>5000ms</option>
             </select>
 
             <br/>
@@ -374,7 +389,7 @@ class Viewer extends React.Component {
         this.onStopButtonClicked = this.onStopButtonClicked.bind(this);
         this.onReplayButtonClicked = this.onReplayButtonClicked.bind(this);
 
-        this.onCountChanged = this.onCountChanged.bind(this);
+        this.onTimeScaleChanged = this.onTimeScaleChanged.bind(this);
         this.onChannelChanged = this.onChannelChanged.bind(this);
         this.onSpeedChanged = this.onSpeedChanged.bind(this);
         this.onSelectionChanged = this.onSelectionChanged.bind(this);
@@ -406,8 +421,8 @@ class Viewer extends React.Component {
         this.playerRef.graphRef.setoffset(0.0);
     }
     
-    onCountChanged (v){
-        this.playerRef.setPeakCount(v);
+    onTimeScaleChanged (v){
+        this.playerRef.setTimeScale(v);
     }
 
     onChannelChanged(v){
@@ -419,7 +434,6 @@ class Viewer extends React.Component {
     }
 
     onSelectionChanged(arr){
-        console.log(arr);
         this.playerRef.setChannelSelection(arr);
     }
 
@@ -430,7 +444,7 @@ class Viewer extends React.Component {
     }
 
     onLoadingProgressChanged(file, prog){
-        console.log(prog + '%');
+        //console.log(prog + '%');
 
         var loadingTxt = document.getElementById("loadingTxt");
 
@@ -477,7 +491,7 @@ class Viewer extends React.Component {
                 onPlayButtonClicked={this.onPlayButtonClicked}
                 onStopButtonClicked={this.onStopButtonClicked}
                 onReplayButtonClicked={this.onReplayButtonClicked}
-                onCountChanged={this.onCountChanged}
+                onTimeScaleChanged={this.onTimeScaleChanged}
                 onChannelChanged={this.onChannelChanged}
                 onSpeedChanged={this.onSpeedChanged}/>
                 <ChannelList 
