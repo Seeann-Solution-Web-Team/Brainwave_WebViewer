@@ -8,7 +8,7 @@ class PlayerController extends React.Component {
     this.stop_onclick = this.stop_onclick.bind(this);
     this.replay_onclick = this.replay_onclick.bind(this);
 
-    this.count_select_onchange = this.count_select_onchange.bind(this);
+    this.timescale_select_onchange = this.timescale_select_onchange.bind(this);
     this.channel_select_onchange = this.channel_select_onchange.bind(this);
     this.speed_select_onchange = this.speed_select_onchange.bind(this);
   }
@@ -28,9 +28,9 @@ class PlayerController extends React.Component {
       this.props.onReplayButtonClicked();
   }
 
-  count_select_onchange() {
-    if (this.props.onCountChanged !== undefined)
-      this.props.onCountChanged(document.getElementById('count_select').value);
+  timescale_select_onchange (){
+    if (this.props.onTimeScaleChanged !== undefined)
+        this.props.onTimeScaleChanged(document.getElementById("timescale_select").value);
   }
 
   channel_select_onchange() {
@@ -49,11 +49,7 @@ class PlayerController extends React.Component {
     var st = {
       fontSize: '24px',
     };
-    var btnStyle = {
-      height: '50px',
-      width: '50px',
-    };
-
+    
     return (
       <div className='player_Controller'>
         <div>
@@ -68,18 +64,15 @@ class PlayerController extends React.Component {
           </button>
         </div>
         <br />
-        <span>확대</span>
-        <select
-          id='count_select'
-          defaultValue='1000'
-          onChange={this.count_select_onchange}
-        >
-          <option value='500'>500</option>
-          <option value='1000'>1000</option>
-          <option value='2000'>2000</option>
-          <option value='3000'>3000</option>
-          <option value='4000'>4000</option>
-          <option value='5000'>5000</option>
+        <span>timescale</span>
+        <select id="timescale_select" defaultValue='1000' onChange={this.timescale_select_onchange}>
+          <option value='1'>1ms</option>
+          <option value='50'>50ms</option>
+          <option value='250'>250ms</option>
+          <option value='500'>500ms</option>
+          <option value='1000'>1000ms</option>
+          <option value='2500'>2500ms</option>
+          <option value='5000'>5000ms</option>
         </select>
 
         <br />

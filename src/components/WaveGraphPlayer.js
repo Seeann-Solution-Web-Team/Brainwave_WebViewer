@@ -1,15 +1,17 @@
 import CanvasGraph from './CanvasGraph';
+import GLGraph from './GLGraph'
 import React from 'react';
 
 class WaveGraphPlayer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      timescale: 1000,
       channels: 32,
-      count: 1000,
       speed: 1.0,
       canvasWidth: 1600,
-      isPlaying: false,
+      canvasHeight: 800,
+      isPlaying: false
     };
 
     this.graphRef = React.createRef();
@@ -18,6 +20,7 @@ class WaveGraphPlayer extends React.Component {
     this.onPlayStateChanged = this.onPlayStateChanged.bind(this);
     this.onOffsetChanged = this.onOffsetChanged.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onWheel = this.onWheel.bind(this);
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.onResize = this.onResize.bind(this);
 
@@ -26,17 +29,20 @@ class WaveGraphPlayer extends React.Component {
 
   componentDidMount() {
     this.setState({ isPlaying: this.graphRef.isPlaying });
-    this.onResize();
     //fetch('http://localhost:3000/api');
     window.addEventListener('resize', this.onResize);
     window.addEventListener('keydown', this.onKeyDown);
+    document.getElementById("gridCanvas").addEventListener("wheel", this.onWheel);
 
     this.timeLabel = document.getElementById('timeLabel');
+
+    this.onResize();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKeyDown);
+    document.getElementById("gridCanvas").removeEventListener("wheel", this.onWheel);
   }
 
   applyFile(file) {
@@ -83,9 +89,15 @@ class WaveGraphPlayer extends React.Component {
     else if (e.keyCode === 39) this.graphRef.next();
   }
 
-  onResize() {
+  onWheel(e){
+    this.graphRef.addverticalscroll(e.deltaY);
+  }
+
+  onResize(){
+    var rt = this.graphRef.getCanvas().getBoundingClientRect();
     this.setState({
-      canvasWidth: this.graphRef.getCanvas().getBoundingClientRect().width,
+        canvasWidth: rt.width,
+        canvasHeight: rt.height
     });
   }
 
@@ -93,8 +105,8 @@ class WaveGraphPlayer extends React.Component {
     this.setState({ channels: c });
   }
 
-  setPeakCount(c) {
-    this.setState({ count: c });
+  setTimeScale (v){
+    this.setState({timescale: v});
   }
 
   setSpeed(s) {
@@ -113,6 +125,11 @@ class WaveGraphPlayer extends React.Component {
             width: '50px'
         }
         */
+
+    var divStyle={
+        height: '100%'
+    }
+
     var labelStyle = {
       fontSize: '18px',
       display: 'flex',
@@ -120,21 +137,17 @@ class WaveGraphPlayer extends React.Component {
     };
 
     return (
-      <div>
-        <CanvasGraph
-          ref={(ref) => {
-            this.graphRef = ref;
-          }}
-          height={25}
-          width={this.state.canvasWidth}
-          margin={10}
-          channels={this.state.channels}
-          count={this.state.count}
-          speed={this.state.speed}
-          strokeColor='#FFFFFF'
-          onPlayStateChanged={this.onPlayStateChanged}
-          onOffsetChanged={this.onOffsetChanged}
-        />
+      <div style={divStyle}>
+        <GLGraph ref={ref=>{this.graphRef = ref;}}
+            width={this.state.canvasWidth} 
+            height={this.state.canvasHeight} 
+            margin={10}
+            channels={this.state.channels} 
+            timescale={this.state.timescale}
+            speed={this.state.speed} 
+            strokeColor="#FFFFFF"
+            onPlayStateChanged={this.onPlayStateChanged}
+            onOffsetChanged={this.onOffsetChanged}/>
         <div>
           <label id='timeLabel' style={labelStyle}>
             00:00/00:00

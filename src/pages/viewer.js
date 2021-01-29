@@ -21,7 +21,7 @@ class viewer extends React.Component {
     this.onStopButtonClicked = this.onStopButtonClicked.bind(this);
     this.onReplayButtonClicked = this.onReplayButtonClicked.bind(this);
 
-    this.onCountChanged = this.onCountChanged.bind(this);
+    this.onTimeScaleChanged = this.onTimeScaleChanged.bind(this);
     this.onChannelChanged = this.onChannelChanged.bind(this);
     this.onSpeedChanged = this.onSpeedChanged.bind(this);
     this.onSelectionChanged = this.onSelectionChanged.bind(this);
@@ -56,8 +56,8 @@ class viewer extends React.Component {
     this.playerRef.graphRef.setoffset(0.0);
   }
 
-  onCountChanged(v) {
-    this.playerRef.setPeakCount(v);
+  onTimeScaleChanged (v){
+    this.playerRef.setTimeScale(v);
   }
 
   onChannelChanged(v) {
@@ -69,7 +69,6 @@ class viewer extends React.Component {
   }
 
   onSelectionChanged(arr) {
-    console.log(arr);
     this.playerRef.setChannelSelection(arr);
   }
 
@@ -80,7 +79,7 @@ class viewer extends React.Component {
   }
 
   onLoadingProgressChanged(file, prog) {
-    console.log(prog + '%');
+    //console.log(prog + '%');
 
     var loadingTxt = document.getElementById('loadingTxt');
 
@@ -130,7 +129,7 @@ class viewer extends React.Component {
                 onPlayButtonClicked={this.onPlayButtonClicked}
                 onStopButtonClicked={this.onStopButtonClicked}
                 onReplayButtonClicked={this.onReplayButtonClicked}
-                onCountChanged={this.onCountChanged}
+                onTimeScaleChanged={this.onTimeScaleChanged}
                 onChannelChanged={this.onChannelChanged}
                 onSpeedChanged={this.onSpeedChanged}
               />
