@@ -14,6 +14,7 @@ class RHSFile {
     console.log('loading ' + fileId);
 
     //Test
+    this.fileId = fileId;
     this.request = new XMLHttpRequest();
     this.request.open('GET', 'api/viewer/fileId/' + fileId, true);
     this.request.responseType = 'arraybuffer';
@@ -58,7 +59,7 @@ class RHSFile {
       axios
         .get('/api/auth/accessToken')
         .then(() => {
-          this.request.open('GET', 'api/viewer/fileId/' + fileId, true);
+          this.request.open('GET', 'api/viewer/fileId/' + this.fileId, true);
         })
         .catch((error) => {
           if (error.response.status == 401) {

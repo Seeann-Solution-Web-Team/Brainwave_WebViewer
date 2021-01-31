@@ -86,7 +86,7 @@ exports.login = (req, res, next) => {
 exports.logout = (req, res) => {
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
-  res.end(200);
+  res.status(200).end();
 };
 
 exports.accessToken = (req, res) => {
