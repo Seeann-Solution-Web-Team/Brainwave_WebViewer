@@ -18,6 +18,7 @@ var storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(null, `${file.originalname}_${Date.now()}`);
   },
+  npm,
 });
 
 var uploadFile = multer({ storage: storage, fileFilter: imageFilter });
