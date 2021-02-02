@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../../../models/db');
+const db = require('../../../model/db');
 
 exports.uploadFile = async (req, res) => {
   try {
@@ -11,9 +11,9 @@ exports.uploadFile = async (req, res) => {
       return res.send(`You must select a file.`);
     }
     db.query(
-      `INSERT INTO rhs_data (id, user_title, name, address, date, owner_id)
-    VALUES (UUID_TO_BIN(UUID(), true), ?, ?, ?, NOW(), UUID_TO_BIN(?, true))`,
-      [req.body.title, req.file.originalname, req.file.path, req.user.id],
+      `INSERT INTO RhsData (id, name, userTitle, address, ownerId, createdAt)
+    VALUES (UUID(), ?, ?, ?, ?,  NOW())`,
+      [req.file.originalname, req.body.title, req.file.path, req.user.id],
       (error, result) => {
         if (error) {
           throw error;

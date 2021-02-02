@@ -89,12 +89,17 @@ class StoragePage extends React.Component {
       let formData = new FormData();
       formData.append('title', this.state.uploadFileTitle);
       formData.append('rhs_file', this.state.uploadFile);
-      const upload_options = {
-        method: 'POST',
-        body: formData,
+      const upload_datas = {
+        title: this.state.uploadFileTitle,
+        rhs_file: this.state.uploadFile,
       };
 
-      axios('/api/storage/userfile', upload_options)
+      axios
+        .post('/api/storage/userfile', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then((result) => {
           console.log('handleUpload result:', result);
           this.setModalShow(false);

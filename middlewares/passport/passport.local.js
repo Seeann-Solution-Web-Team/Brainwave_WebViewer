@@ -1,6 +1,6 @@
 // const passport = require('passport');
 const bcrypt = require('bcrypt');
-const db = require('../../models/db');
+const db = require('../../model/db');
 
 module.exports = {
   option: {
@@ -10,7 +10,7 @@ module.exports = {
 
   verify: async (email, password, done) => {
     db.query(
-      `SELECT BIN_TO_UUID(id), name, email, password FROM user WHERE email=?`,
+      `SELECT id, name, email, password FROM Users WHERE email=?`,
       [email],
       (error, result) => {
         if (error) {
@@ -19,7 +19,7 @@ module.exports = {
           return done(null, false);
         } else {
           const user = {
-            id: result[0]['BIN_TO_UUID(id)'],
+            id: result[0]['id'],
             username: result[0].name,
             email: result[0].email,
           };
