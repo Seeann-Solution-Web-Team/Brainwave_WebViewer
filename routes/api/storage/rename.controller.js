@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../../../models/db');
+const db = require('../../../model/db');
 
 exports.renameFile = async (req, res) => {
   try {
@@ -10,7 +10,7 @@ exports.renameFile = async (req, res) => {
       return res.status(400).end();
     }
     db.query(
-      `UPDATE rhs_data SET user_title=? WHERE id=UUID_TO_BIN(?,true) AND owner_id=UUID_TO_BIN(?, true)`,
+      `UPDATE RhsData SET userTitle=? WHERE id=? AND ownerId=?`,
       [req.body.filename, req.body.fileId, req.user.id],
       (error, result) => {
         if (error) {

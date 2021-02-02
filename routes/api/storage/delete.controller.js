@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../../../models/db');
+const db = require('../../../model/db');
 
 exports.deleteFile = async (req, res) => {
   try {
@@ -12,7 +12,7 @@ exports.deleteFile = async (req, res) => {
       return res.send(`Info missing: Please select a file`);
     } else {
       db.query(
-        `DELETE FROM rhs_data WHERE owner_id=UUID_TO_BIN(?, true) AND id=UUID_TO_BIN(?, true)`,
+        `DELETE FROM RhsData WHERE ownerId=? AND id=?`,
         [req.user.id, req.body.fileId],
         (error, result) => {
           if (error) {

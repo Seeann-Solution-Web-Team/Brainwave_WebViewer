@@ -46,13 +46,13 @@ class DataTable extends React.Component {
                 }
                 key={list[item].id}
                 onClick={() =>
-                  this.toggleActive(list[item].id, list[item].user_title)
+                  this.toggleActive(list[item].id, list[item].userTitle)
                 }
               >
                 <td>{num}</td>
-                <td>{list[item].user_title}</td>
+                <td>{list[item].userTitle}</td>
                 <td>{list[item].name}</td>
-                <td>{list[item].date}</td>
+                <td>{list[item].createdAt}</td>
               </tr>
             );
           })}

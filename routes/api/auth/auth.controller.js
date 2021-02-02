@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const user = require('../../../models/user');
-const db = require('../../../models/db');
+const db = require('../../../model/db');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
@@ -20,15 +19,15 @@ exports.register = (req, res) => {
   let post = req.body;
   bcrypt.hash(post.password, saltRounds).then(function (crypted_PW) {
     db.query(
-      `INSERT INTO user (id, name, email, password)
-    VALUES (UUID_TO_BIN(UUID(), true), ?, ?, ?)`,
+      `INSERT INTO Users (id, name, email, password)
+    VALUES (UUID(), ?, ?, ?)`,
       [post.username, post.email, crypted_PW],
       (err) => {
         if (err) {
           throw err;
         } else {
           console.log('DONE');
-          res.end();
+          res.status(200).end();
         }
       }
     );

@@ -22,22 +22,10 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(compression());
 app.use(cors());
-// app.use(
-//   session({
-//     secret: 'keyboard cat',
-//     resave: false,
-//     saveUninitialized: true,
-//   })
-// );
-// app.use(passport.session());
+
 app.use(passport.initialize());
 passportConfig();
-// app.use(passport.authenticate('jwt', { session: false }));
 
-// app.get('*', (req, res) => {
-//   console.log(req.user);
-//   res.send(req.user);
-// });
 app.use('/api', require('../routes/api'));
 
 app.use((req, res, next) => {
