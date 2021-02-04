@@ -20,9 +20,44 @@ class ScrollBar extends React.Component{
         this.canvasContext.shadowBlur = 0;
 
         this.renderCanvas();
+
+        var c = document.getElementById("scrollBarCanvas");
+        c.addEventListener("touchstart", this.touchHandler, true);
+        c.addEventListener("touchmove", this.touchHandler, true);
+        c.addEventListener("touchend", this.touchHandler, true);
+        c.addEventListener("touchcancel", this.touchHandler, true);
     }
 
     componentWillUnmount(){
+        var c = document.getElementById("scrollBarCanvas");
+        c.removeEventListener("touchstart", this.touchHandler, true);
+        c.removeEventListener("touchmove", this.touchHandler, true);
+        c.removeEventListener("touchend", this.touchHandler, true);
+        c.removeEventListener("touchcancel", this.touchHandler, true);
+    }
+
+    //Touch event to mouse event
+    touchHandler(event)
+    {
+        var touches = event.changedTouches;
+        var first = touches[0];
+        var type = "";
+    
+        switch(event.type)
+        {
+            case "touchstart": type = "mousedown"; break;
+            case "touchmove":  type="mousemove"; break;       
+            case "touchend":   type="mouseup"; break;
+            default: return;
+        }
+        var simulatedEvent = document.createEvent("MouseEvent");
+        simulatedEvent.initMouseEvent(type, true, true, window, 1,
+                                first.screenX, first.screenY,
+                                first.clientX, first.clientY, false,
+                                false, false, false, 0/*left*/, null);
+    
+        first.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
     }
 
     //Events
@@ -99,7 +134,7 @@ class ScrollBar extends React.Component{
         if (this.canvasRef.current)
             this.renderCanvas();
 
-        return <canvas
+        return <canvas id="scrollBarCanvas"
                 ref={this.canvasRef}
                 width={this.props.width} height={this.props.height}
                 onMouseDown={this.ondragstart} 

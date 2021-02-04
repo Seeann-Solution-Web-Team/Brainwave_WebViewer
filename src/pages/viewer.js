@@ -23,7 +23,6 @@ class WaveGraphPlayer extends React.Component{
         this.onPlayStateChanged = this.onPlayStateChanged.bind(this);
         this.onOffsetChanged = this.onOffsetChanged.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
-        this.onWheel = this.onWheel.bind(this);
         this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
         this.onResize = this.onResize.bind(this);
 
@@ -35,7 +34,6 @@ class WaveGraphPlayer extends React.Component{
         //fetch('http://localhost:3000/api');
         window.addEventListener("resize", this.onResize);
         window.addEventListener("keydown", this.onKeyDown);
-        document.getElementById("gridCanvas").addEventListener("wheel", this.onWheel);
 
         this.timeLabel = document.getElementById('timeLabel');
 
@@ -45,7 +43,6 @@ class WaveGraphPlayer extends React.Component{
     componentWillUnmount(){
         window.removeEventListener("resize", this.onResize);
         window.removeEventListener("keydown", this.onKeyDown);
-        document.getElementById("gridCanvas").removeEventListener("wheel", this.onWheel);
     }
 
     applyFile (file){
@@ -67,10 +64,10 @@ class WaveGraphPlayer extends React.Component{
         if (this.currentFile === null)
             return;
         
-        var current = Math.floor(p * this.currentFile.recordLength);
         var recordMin = (Math.floor(this.currentFile.recordLength / 60)).toString().padStart(2, '0');
         var recordSec = (this.currentFile.recordLength % 60).toString().padStart(2, '0');
 
+        var current = Math.floor(p * this.currentFile.recordLength);
         var currentMin = (Math.floor(current / 60)).toString().padStart(2, '0');
         var currentSec = (current % 60).toString().padStart(2, '0');
 
@@ -89,11 +86,6 @@ class WaveGraphPlayer extends React.Component{
         else if (e.keyCode === 39)
             this.graphRef.next();
     }
-
-    onWheel(e){
-          this.graphRef.addverticalscroll(e.deltaY);
-    }
-
     onResize(){
         var rt = this.graphRef.getCanvas().getBoundingClientRect();
         this.setState({
@@ -140,7 +132,7 @@ class WaveGraphPlayer extends React.Component{
         <div style={divStyle}>
             <GLGraph ref={ref=>{this.graphRef = ref;}}
             width={this.state.canvasWidth} height={this.state.canvasHeight} margin={10}
-            channels={this.state.channels} timescale={this.state.timescale} speed={this.state.speed} 
+            channels={this.state.channels} timescale={parseInt(this.state.timescale)} speed={this.state.speed} 
             strokeColor="#FFFFFF"
             onPlayStateChanged={this.onPlayStateChanged}
             onOffsetChanged={this.onOffsetChanged}/>
@@ -284,6 +276,7 @@ class PlayerController extends React.Component{
         this.timescale_select_onchange = this.timescale_select_onchange.bind(this);
         this.channel_select_onchange = this.channel_select_onchange.bind(this);
         this.speed_select_onchange = this.speed_select_onchange.bind(this);
+        this.filter_select_onchange = this.filter_select_onchange.bind(this);
     }
 
     play_onclick(e){
@@ -316,6 +309,12 @@ class PlayerController extends React.Component{
             this.props.onSpeedChanged(document.getElementById("speed_select").value);
     }
 
+    filter_select_onchange(){
+        if (this.props.onFilterChanged !== undefined)
+            this.props.onFilterChanged( parseInt(document.getElementById("notch_freq_select").value), 
+                                        parseInt(document.getElementById("highpass_cutoff_select").value));
+    }
+
     render(){
         var st = {
             fontSize: '24px',
@@ -344,7 +343,6 @@ class PlayerController extends React.Component{
             </select>
 
             <br/>
-            <br/>
             <span>재생 속도</span>
             <select id="speed_select" defaultValue='1.0' onChange={this.speed_select_onchange}>
                 <option value='0.1'>x0.1</option>
@@ -354,6 +352,29 @@ class PlayerController extends React.Component{
                 <option value='1.25'>x1.25</option>
                 <option value='1.5'>x1.5</option>
                 <option value='2.0'>x2.0</option>
+            </select>
+            
+            <br/>
+            <span>Notch Filter</span>
+            <select id="notch_freq_select" defaultValue={0} onChange={this.filter_select_onchange}>
+                <option value={0}>None</option>
+                <option value={50}>50Hz</option>
+                <option value={60}>60Hz</option>
+            </select>
+
+            <br/>
+            <span>Highpass Filter</span>
+            <select id="highpass_cutoff_select" defaultValue={0} onChange={this.filter_select_onchange}>
+                <option value={0}>None</option>
+                <option value={100}>100Hz</option>
+                <option value={150}>150Hz</option>
+                <option value={200}>200Hz</option>
+                <option value={250}>250Hz</option>
+                <option value={300}>300Hz</option>
+                <option value={350}>350Hz</option>
+                <option value={400}>400Hz</option>
+                <option value={450}>450Hz</option>
+                <option value={500}>500Hz</option>
             </select>
 
             <br/><br/><br/>
@@ -393,6 +414,7 @@ class Viewer extends React.Component {
         this.onChannelChanged = this.onChannelChanged.bind(this);
         this.onSpeedChanged = this.onSpeedChanged.bind(this);
         this.onSelectionChanged = this.onSelectionChanged.bind(this);
+        this.onFilterChanged = this.onFilterChanged.bind(this);
 
         this.onFileLoadStart = this.onFileLoadStart.bind(this);
         this.onLoadingProgressChanged = this.onLoadingProgressChanged.bind(this);
@@ -435,6 +457,10 @@ class Viewer extends React.Component {
 
     onSelectionChanged(arr){
         this.playerRef.setChannelSelection(arr);
+    }
+
+    onFilterChanged(notch, hpCutoff){
+        this.playerRef.graphRef.changeFilter(notch, hpCutoff);
     }
 
     onFileLoadStart(){
@@ -493,7 +519,8 @@ class Viewer extends React.Component {
                 onReplayButtonClicked={this.onReplayButtonClicked}
                 onTimeScaleChanged={this.onTimeScaleChanged}
                 onChannelChanged={this.onChannelChanged}
-                onSpeedChanged={this.onSpeedChanged}/>
+                onSpeedChanged={this.onSpeedChanged}
+                onFilterChanged={this.onFilterChanged}/>
                 <ChannelList 
                 ref={this.channelListRef}
                 onFileLoadStart={this.onFileLoadStart} 

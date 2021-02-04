@@ -392,37 +392,65 @@ class RHSFile{
         return nor;
     }
 
-    //Notch Filter
-    getFilteredAmpData(notchFreq, bandwidth, sampleFreq){
+    //Notch & Highpass Filter
+    getFilteredAmpData(notchFreq, bandwidth, highpassCutoff, sampleFreq){
+        if (notchFreq === 0 && highpassCutoff === 0)
+            return this.getNormalizedAmpData();            
+        
         var arr = this.getRawAmpData();
         var filtered = [];
 
-        // Calculate biquad IIR filter coefficients.
-        var d = Math.exp(-Math.PI * bandwidth / sampleFreq);
-        
-        var a1 = -(1.0 + d * d) * Math.cos(2.0 * Math.PI * notchFreq / sampleFreq);
-        var a2 = d * d;
-        var b0 = (1 + d * d) / 2.0;
-        var b1 = a1;
-        var b2 = b0;
-
-        
         var value = 0;
-        for (var c = 0; c < arr.length; c++){
-            filtered.push([]);
-            filtered[c].push(0);
-            filtered[c].push(0);
+        var i = 0;
+        var c = 0;
 
-            for (var i = 2; i < arr[c].length; i++){
-                value = b0 * arr[c][i] +
-                        b1 * arr[c][i - 1] + 
-                        b2 * arr[c][i - 2] -
-                        a1 * filtered[c][i - 1] -
-                        a2 * filtered[c][i - 2];
-                filtered[c].push(value);
+        //Notch Filter
+        if (notchFreq > 0){
+            // Calculate biquad IIR filter coefficients.
+            var d = Math.exp(-Math.PI * bandwidth / sampleFreq);
+            
+            var a1 = -(1.0 + d * d) * Math.cos(2.0 * Math.PI * notchFreq / sampleFreq);
+            var a2 = d * d;
+            var b0 = (1 + d * d) / 2.0;
+            var b1 = a1;
+            var b2 = b0;
+
+            for (c = 0; c < arr.length; c++){
+                filtered.push([]);
+                filtered[c].push(0);
+                filtered[c].push(0);
+
+                for (i = 2; i < arr[c].length; i++){
+                    value = b0 * arr[c][i] +
+                            b1 * arr[c][i - 1] + 
+                            b2 * arr[c][i - 2] -
+                            a1 * filtered[c][i - 1] -
+                            a2 * filtered[c][i - 2];
+                    filtered[c].push(value);
+                }
             }
         }
 
+        //Highpass Filter
+        if (highpassCutoff > 0){
+            var aHpf = Math.exp(-2.0 * Math.PI * highpassCutoff / sampleFreq);
+            var bHpf = 1.0 - aHpf;
+            var hpFilterState = [];
+
+            if (notchFreq === 0)
+                filtered = arr.slice();
+            
+            for (c = 0; c < filtered.length; c++){
+                hpFilterState.push(0);
+                for (i = 0; i < filtered[c].length; i++){
+                    value = filtered[c][i];
+                    filtered[c][i] -= hpFilterState[c];
+                    hpFilterState[c] = aHpf * hpFilterState[c] + bHpf * value;
+                }
+            }
+        }
+
+        //Normalize and return
         var normalized = [];
         for (c = 0; c < filtered.length; c++){
             var max = this.max(filtered[c]);
