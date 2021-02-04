@@ -355,7 +355,7 @@ class PlayerController extends React.Component{
             </select>
             
             <br/>
-            <span>Notch Filter</span>
+            <span>Notch filter</span>
             <select id="notch_freq_select" defaultValue={0} onChange={this.filter_select_onchange}>
                 <option value={0}>None</option>
                 <option value={50}>50Hz</option>
@@ -363,7 +363,7 @@ class PlayerController extends React.Component{
             </select>
 
             <br/>
-            <span>Highpass Filter</span>
+            <span>Highpass cutoff</span>
             <select id="highpass_cutoff_select" defaultValue={0} onChange={this.filter_select_onchange}>
                 <option value={0}>None</option>
                 <option value={100}>100Hz</option>
@@ -377,11 +377,11 @@ class PlayerController extends React.Component{
                 <option value={500}>500Hz</option>
             </select>
 
-            <br/><br/><br/>
+            <br/>
             <span>대충 메모 들어갈자리</span>
-            <br/><br/>
+            <br/>
             <span>대충 메모 들어갈자리2</span>
-            <br/><br/>
+            <br/>
             <span>대충 메모 들어갈자리3</span>
         </div>);
 
