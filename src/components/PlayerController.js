@@ -11,6 +11,7 @@ class PlayerController extends React.Component {
     this.timescale_select_onchange = this.timescale_select_onchange.bind(this);
     this.channel_select_onchange = this.channel_select_onchange.bind(this);
     this.speed_select_onchange = this.speed_select_onchange.bind(this);
+    this.filter_select_onchange = this.filter_select_onchange.bind(this);
   }
 
   play_onclick(e) {
@@ -45,6 +46,12 @@ class PlayerController extends React.Component {
       this.props.onSpeedChanged(document.getElementById('speed_select').value);
   }
 
+  filter_select_onchange(){
+    if (this.props.onFilterChanged !== undefined)
+        this.props.onFilterChanged( parseInt(document.getElementById("notch_freq_select").value), 
+                                    parseInt(document.getElementById("highpass_cutoff_select").value));
+}
+
   render() {
     var st = {
       fontSize: '24px',
@@ -63,9 +70,11 @@ class PlayerController extends React.Component {
             Rewind
           </button>
         </div>
-        <br />
+        <br/>
         <span>timescale</span>
-        <select id="timescale_select" defaultValue='1000' onChange={this.timescale_select_onchange}>
+        <select id="timescale_select" 
+                defaultValue='1000' 
+                onChange={this.timescale_select_onchange}>
           <option value='1'>1ms</option>
           <option value='50'>50ms</option>
           <option value='250'>250ms</option>
@@ -75,14 +84,11 @@ class PlayerController extends React.Component {
           <option value='5000'>5000ms</option>
         </select>
 
-        <br />
-        <br />
+        <br/>
         <span>재생 속도</span>
-        <select
-          id='speed_select'
-          defaultValue='1.0'
-          onChange={this.speed_select_onchange}
-        >
+        <select id="speed_select" 
+                defaultValue='1.0' 
+                onChange={this.speed_select_onchange}>
           <option value='0.1'>x0.1</option>
           <option value='0.25'>x0.25</option>
           <option value='0.5'>x0.5</option>
@@ -91,17 +97,46 @@ class PlayerController extends React.Component {
           <option value='1.5'>x1.5</option>
           <option value='2.0'>x2.0</option>
         </select>
+            
+        <br/>
+        <span>Notch filter</span>
+        <select id="notch_freq_select" 
+                defaultValue={0} 
+                onChange={this.filter_select_onchange}>
+          <option value={0}>None</option>
+          <option value={50}>50Hz</option>
+          <option value={60}>60Hz</option>
+        </select>
 
-        <br />
-        <br />
-        <br />
-        <span>대충 메모 들어갈자리</span>
-        <br />
-        <br />
-        <span>대충 메모 들어갈자리2</span>
-        <br />
-        <br />
-        <span>대충 메모 들어갈자리3</span>
+        <br/>
+        <span>Highpass cutoff</span>
+        <select id="highpass_cutoff_select" 
+                defaultValue={0} 
+                onChange={this.filter_select_onchange}>
+          <option value={0}>None</option>
+          <option value={100}>100Hz</option>
+          <option value={150}>150Hz</option>
+          <option value={200}>200Hz</option>
+          <option value={250}>250Hz</option>
+          <option value={300}>300Hz</option>
+          <option value={350}>350Hz</option>
+          <option value={400}>400Hz</option>
+          <option value={450}>450Hz</option>
+          <option value={500}>500Hz</option>
+        </select>
+
+        <br/>
+        <span>
+          메모1
+        </span>
+        <br/>
+        <span>
+          메모2
+        </span>
+        <br/>
+        <span>
+          메모3
+        </span>
       </div>
     );
   }

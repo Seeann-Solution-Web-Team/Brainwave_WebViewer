@@ -10,8 +10,8 @@ exports.uploadFile = async (req, res) => {
       return res.send(`You must select a file.`);
     }
     db.query(
-      `INSERT INTO RhsData (id, name, userTitle, address, ownerId, createdAt)
-    VALUES (UUID(), ?, ?, ?, ?,  NOW())`,
+      `INSERT INTO RhsData (id, name, userTitle, address, ownerId, createdAt, updatedAt)
+    VALUES (UUID(), ?, ?, ?, ?,  NOW(), NOW())`,
       [req.file.originalname, req.body.title, req.file.path, req.user.id],
       (error, result) => {
         if (error) {

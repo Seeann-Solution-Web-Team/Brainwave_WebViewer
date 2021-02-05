@@ -20,7 +20,6 @@ class WaveGraphPlayer extends React.Component {
     this.onPlayStateChanged = this.onPlayStateChanged.bind(this);
     this.onOffsetChanged = this.onOffsetChanged.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
-    this.onWheel = this.onWheel.bind(this);
     this.onPlayButtonClicked = this.onPlayButtonClicked.bind(this);
     this.onResize = this.onResize.bind(this);
 
@@ -32,7 +31,6 @@ class WaveGraphPlayer extends React.Component {
     //fetch('http://localhost:3000/api');
     window.addEventListener('resize', this.onResize);
     window.addEventListener('keydown', this.onKeyDown);
-    document.getElementById("gridCanvas").addEventListener("wheel", this.onWheel);
 
     this.timeLabel = document.getElementById('timeLabel');
 
@@ -42,7 +40,6 @@ class WaveGraphPlayer extends React.Component {
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKeyDown);
-    document.getElementById("gridCanvas").removeEventListener("wheel", this.onWheel);
   }
 
   applyFile(file) {
@@ -62,7 +59,6 @@ class WaveGraphPlayer extends React.Component {
   onOffsetChanged(p) {
     if (this.currentFile === null) return;
 
-    var current = Math.floor(p * this.currentFile.recordLength);
     var recordMin = Math.floor(this.currentFile.recordLength / 60)
       .toString()
       .padStart(2, '0');
@@ -70,6 +66,7 @@ class WaveGraphPlayer extends React.Component {
       .toString()
       .padStart(2, '0');
 
+    var current = Math.floor(p * this.currentFile.recordLength);
     var currentMin = Math.floor(current / 60)
       .toString()
       .padStart(2, '0');
@@ -87,10 +84,6 @@ class WaveGraphPlayer extends React.Component {
     if (e.keyCode === 32) this.graphRef.togglePlay();
     else if (e.keyCode === 37) this.graphRef.prev();
     else if (e.keyCode === 39) this.graphRef.next();
-  }
-
-  onWheel(e){
-    this.graphRef.addverticalscroll(e.deltaY);
   }
 
   onResize(){
@@ -143,7 +136,7 @@ class WaveGraphPlayer extends React.Component {
             height={this.state.canvasHeight} 
             margin={10}
             channels={this.state.channels} 
-            timescale={this.state.timescale}
+            timescale={parseInt(this.state.timescale)}
             speed={this.state.speed} 
             strokeColor="#FFFFFF"
             onPlayStateChanged={this.onPlayStateChanged}

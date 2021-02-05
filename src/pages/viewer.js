@@ -29,6 +29,7 @@ class viewer extends React.Component {
     this.onFileLoadStart = this.onFileLoadStart.bind(this);
     this.onLoadingProgressChanged = this.onLoadingProgressChanged.bind(this);
     this.onFileLoaded = this.onFileLoaded.bind(this);
+    this.onFilterChanged = this.onFilterChanged.bind(this);
   }
 
   componentDidMount() {
@@ -70,6 +71,10 @@ class viewer extends React.Component {
 
   onSelectionChanged(arr) {
     this.playerRef.setChannelSelection(arr);
+  }
+
+  onFilterChanged(notch, hpCutoff){
+    this.playerRef.graphRef.changeFilter(notch, hpCutoff);
   }
 
   onFileLoadStart() {
@@ -132,6 +137,7 @@ class viewer extends React.Component {
                 onTimeScaleChanged={this.onTimeScaleChanged}
                 onChannelChanged={this.onChannelChanged}
                 onSpeedChanged={this.onSpeedChanged}
+                onFilterChanged={this.onFilterChanged}
               />
             </div>
             <div className='menu__channel_list'>
