@@ -15,8 +15,10 @@ router.post(
   uploadController.uploadFile
 );
 
+//Delete
 router.delete('/userfile', deleteController.deleteFile);
 
+//Update
 router.put('/userfile', renameController.renameFile);
 
 module.exports = router;

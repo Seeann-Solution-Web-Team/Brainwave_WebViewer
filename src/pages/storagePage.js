@@ -22,33 +22,6 @@ class StoragePage extends React.Component {
     };
   }
 
-  getUserFileList = () => {
-    axios
-      .get('/api/storage/filelist')
-      .then((res) => {
-        console.log(res.data);
-        this.setState({
-          dataList: res.data,
-        });
-      })
-      .catch((error) => {
-        if (error.response.status == 401) {
-          console.log(error.response.status);
-          axios
-            .get('/api/auth/accessToken')
-            .then(() => {
-              this.getUserFileList();
-            })
-            .catch((error2) => {
-              if (error2.response.status == 401) {
-                window.localStorage.clear();
-                this.props.history.push('/login');
-              }
-            });
-        }
-      });
-  };
-
   componentDidMount = (e) => {
     if (!window.localStorage.getItem('loggedIn')) {
       window.location.href = '/login';
@@ -77,6 +50,40 @@ class StoragePage extends React.Component {
         console.log(this.state.selectedFileTitle);
       }
     );
+  };
+
+  setModalShow = (show, type) => {
+    this.setState({
+      modalType: type,
+      modalShow: show,
+    });
+  };
+
+  getUserFileList = () => {
+    axios
+      .get('/api/storage/filelist')
+      .then((res) => {
+        console.log(res.data);
+        this.setState({
+          dataList: res.data,
+        });
+      })
+      .catch((error) => {
+        if (error.response.status == 401) {
+          console.log(error.response.status);
+          axios
+            .get('/api/auth/accessToken')
+            .then(() => {
+              this.getUserFileList();
+            })
+            .catch((error2) => {
+              if (error2.response.status == 401) {
+                window.localStorage.clear();
+                this.props.history.push('/login');
+              }
+            });
+        }
+      });
   };
 
   handleUpload = (e) => {
@@ -216,13 +223,6 @@ class StoragePage extends React.Component {
       console.log('file not selected');
       return;
     }
-  };
-
-  setModalShow = (show, type) => {
-    this.setState({
-      modalType: type,
-      modalShow: show,
-    });
   };
 
   handleUploadFileInput = (e) => {

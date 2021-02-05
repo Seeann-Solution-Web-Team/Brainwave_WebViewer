@@ -1,8 +1,7 @@
 const multer = require('multer');
-const express = require('express');
 
 const imageFilter = (req, file, cb) => {
-  console.log('image filter log', file);
+  console.log('file filter log', file);
   // if (file.mimetype.startsWith('image')) {
   //   cb(null, true);
   // } else {

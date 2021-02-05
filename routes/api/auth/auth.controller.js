@@ -17,6 +17,7 @@ POST /api/auth/register
 
 exports.register = (req, res) => {
   let post = req.body;
+  //hashing
   bcrypt.hash(post.password, saltRounds).then(function (crypted_PW) {
     db.query(
       `INSERT INTO Users (id, name, email, password)
@@ -82,12 +83,19 @@ exports.login = (req, res, next) => {
   )(req, res);
 };
 
+/*
+POST /api/auth/logout
+*/
+
 exports.logout = (req, res) => {
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
   res.status(200).end();
 };
 
+/*
+GET /api/auth/accessToken
+*/
 exports.accessToken = (req, res) => {
   let refreshToken = null;
   if (req && req.cookies) {

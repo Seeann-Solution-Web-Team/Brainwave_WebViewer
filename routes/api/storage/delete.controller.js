@@ -1,4 +1,3 @@
-const express = require('express');
 const db = require('../../../model/db');
 
 exports.deleteFile = async (req, res) => {

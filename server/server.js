@@ -1,28 +1,22 @@
 const express = require('express');
 const app = express();
-const indexRouter = require('../routes/api/index');
 const port = process.env.port || 3001;
 
 const compression = require('compression');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const session = require('express-session');
 const path = require('path');
 const passport = require('passport');
 const passportConfig = require('../middlewares/passport');
-const passportJwt = require('../middlewares/passport/passport.jwt');
 
 global.__basedir = path.join(__dirname, '..');
-console.log(__basedir);
-
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(compression());
 app.use(cors());
-
 app.use(passport.initialize());
 passportConfig();
 

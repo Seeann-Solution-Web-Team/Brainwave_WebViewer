@@ -17,9 +17,8 @@ module.exports = {
     };
   },
   verify: async (payload, done) => {
-    console.log('payload==========', payload.exp);
     try {
-      console.log('payload==========1', payload.exp);
+      console.log('payload: ', payload.exp);
       db.query(
         `SELECT id, name, email FROM Users WHERE id=?`,
         [payload.id],
@@ -32,13 +31,11 @@ module.exports = {
               username: result[0].name,
               email: result[0].email,
             };
-            console.log('user found return user');
             return done(null, user);
           }
         }
       );
     } catch (error) {
-      console.log('payload==========2', payload.exp);
       return done(error, false);
     }
   },
