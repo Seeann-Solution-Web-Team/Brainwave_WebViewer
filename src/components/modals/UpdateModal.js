@@ -6,6 +6,7 @@ const UpdateModal = (props) => {
     <Modal
       show={props.show}
       onHide={props.onHide}
+      animation={false}
       backdrop='static'
       keyboard={false}
       size='lg'

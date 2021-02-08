@@ -47,7 +47,7 @@ class LoginPage extends React.Component {
     };
 
     axios.post('/api/auth/login', loginInfo).then((res) => {
-      if (res.status == 401) {
+      if (res.status === 401) {
         console.log('token expired');
       } else {
         alert('로그인 되었습니다');

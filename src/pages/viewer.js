@@ -33,7 +33,13 @@ class viewer extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.location.state.fileId === undefined) return;
+    if (!window.localStorage.getItem('loggedIn')) {
+      window.location.href = '/login';
+    }
+    else if (this.props.location.state === undefined || 
+             this.props.location.state.fileId === undefined){
+      window.location.href = '/storage';
+    }
 
     //Load File
     var rhs = new RHSFile();

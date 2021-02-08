@@ -1,4 +1,3 @@
-import CanvasGraph from './CanvasGraph';
 import GLGraph from './GLGraph'
 import React from 'react';
 
@@ -6,7 +5,7 @@ class WaveGraphPlayer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      timescale: 1000,
+      timescale: 3000,
       channels: 32,
       speed: 1.0,
       canvasWidth: 1600,

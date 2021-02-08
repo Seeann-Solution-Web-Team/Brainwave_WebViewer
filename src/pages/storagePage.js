@@ -69,7 +69,7 @@ class StoragePage extends React.Component {
         });
       })
       .catch((error) => {
-        if (error.response.status == 401) {
+        if (error.response.status === 401) {
           console.log(error.response.status);
           axios
             .get('/api/auth/accessToken')
@@ -77,7 +77,7 @@ class StoragePage extends React.Component {
               this.getUserFileList();
             })
             .catch((error2) => {
-              if (error2.response.status == 401) {
+              if (error2.response.status === 401) {
                 window.localStorage.clear();
                 this.props.history.push('/login');
               }
@@ -117,7 +117,7 @@ class StoragePage extends React.Component {
           this.getUserFileList();
         })
         .catch((error) => {
-          if (error.response.status == 401) {
+          if (error.response.status === 401) {
             console.log(error.response.status);
             axios
               .get('/api/auth/accessToken')
@@ -125,7 +125,7 @@ class StoragePage extends React.Component {
                 this.handleUpload();
               })
               .catch((error2) => {
-                if (error2.response.status == 401) {
+                if (error2.response.status === 401) {
                   window.localStorage.clear();
                   this.props.history.push('/login');
                 }
@@ -152,7 +152,7 @@ class StoragePage extends React.Component {
         this.getUserFileList();
       })
       .catch((error) => {
-        if (error.response.status == 401) {
+        if (error.response.status === 401) {
           console.log(error.response.status);
           axios
             .get('/api/auth/accessToken')
@@ -160,7 +160,7 @@ class StoragePage extends React.Component {
               this.handleRename();
             })
             .catch((error2) => {
-              if (error2.response.status == 401) {
+              if (error2.response.status === 401) {
                 window.localStorage.clear();
                 this.props.history.push('/login');
               }
@@ -193,7 +193,7 @@ class StoragePage extends React.Component {
           this.getUserFileList();
         })
         .catch((error) => {
-          if (error.response.status == 401) {
+          if (error.response.status === 401) {
             console.log(error.response.status);
             axios
               .get('/api/auth/accessToken')
@@ -201,7 +201,7 @@ class StoragePage extends React.Component {
                 this.handleFileRemove();
               })
               .catch((error2) => {
-                if (error2.response.status == 401) {
+                if (error2.response.status === 401) {
                   window.localStorage.clear();
                   this.props.history.push('/login');
                 }
